@@ -9,5 +9,5 @@ Comando:
 
 ```bash
 # test
-ls -la
+ls -la /home
 ```
