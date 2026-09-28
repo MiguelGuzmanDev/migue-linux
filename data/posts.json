@@ -1,0 +1,18 @@
+[
+  {
+    "slug": "optimizacion-kernel",
+    "titulo": "Ajuste de parámetros sysctl para servidores",
+    "fecha": "2026-09-28",
+    "tags": ["linux", "kernel", "sysadmin"],
+    "extracto": "Optimizando somaxconn y TCP reuse para alta carga.",
+    "file": "posts/optimizacion-kernel.md"
+  },
+  {
+    "slug": "monitoreo-systemd",
+    "titulo": "Tips avanzados para filtrar logs con journalctl",
+    "fecha": "2026-09-18",
+    "tags": ["systemd", "bash"],
+    "extracto": "Cómo aislar errores en producción combinando filtros por unidad.",
+    "file": "posts/monitoreo-systemd.md"
+  }
+]

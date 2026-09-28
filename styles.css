@@ -1,0 +1,159 @@
+:root {
+  --bg: #0d1117;          /* Fondo oscuro estilo terminal/GitHub */
+  --card-bg: #161b22;     /* Contenedores de código */
+  --text: #c9d1d9;        /* Texto principal claro */
+  --muted: #8b949e;       /* Metadatos y comentarios */
+  --border: #30363d;      /* Líneas de división */
+  --accent: #58a6ff;      /* Azul cian para enlaces y tags */
+  --prompt: #3fb950;      /* Verde consola para el prompt */
+  --font-mono: "JetBrains Mono", "Fira Code", "Source Code Pro", Menlo, Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-mono); /* Todo el sitio con tipografía técnica */
+  max-width: 740px;
+  margin: 0 auto;
+  padding: 2.5rem 1.2rem;
+  line-height: 1.6;
+  font-size: 0.92rem;
+}
+
+/* Header tipo prompt de consola */
+header {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.terminal-prompt {
+  color: var(--prompt);
+  font-weight: bold;
+}
+
+.terminal-prompt span {
+  color: var(--accent);
+}
+
+header h1 {
+  font-size: 1.3rem;
+  margin: 0.5rem 0 0.2rem 0;
+  color: #ffffff;
+}
+
+header p {
+  color: var(--muted);
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+nav {
+  margin-top: 1rem;
+}
+
+nav a {
+  color: var(--accent);
+  text-decoration: none;
+  margin-right: 1.2rem;
+  font-size: 0.85rem;
+}
+
+nav a:hover {
+  text-decoration: underline;
+}
+
+/* Tarjetas de artículos */
+.post-card {
+  padding: 1.5rem 0;
+  border-bottom: 1px dashed var(--border);
+}
+
+.post-meta {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-bottom: 0.3rem;
+}
+
+.post-title {
+  font-size: 1.15rem;
+  margin: 0 0 0.5rem 0;
+  color: #ffffff;
+}
+
+.post-title a {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.post-title a:hover {
+  color: var(--accent);
+}
+
+.post-excerpt {
+  color: var(--text);
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* Badges de Tags */
+.tag {
+  display: inline-block;
+  background: rgba(56, 139, 253, 0.15);
+  color: var(--accent);
+  border: 1px solid rgba(56, 139, 253, 0.4);
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  margin-right: 0.3rem;
+}
+
+/* Formato de bloques de código dentro del artículo */
+pre {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem;
+  overflow-x: auto;
+  color: #e6edf3;
+  font-size: 0.85rem;
+}
+
+code {
+  font-family: var(--font-mono);
+  background: rgba(110, 118, 129, 0.2);
+  padding: 0.15rem 0.3rem;
+  border-radius: 3px;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+}
+
+/* Estilo responsivo para imágenes dentro del post */
+.post-body img {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  display: block;
+  margin: 1.5rem auto;
+}
+
+/* Enlaces dentro del cuerpo del artículo */
+.post-body a {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+/* Encabezados dentro del Markdown */
+.post-body h1, .post-body h2, .post-body h3 {
+  color: #ffffff;
+  margin-top: 2rem;
+  margin-bottom: 0.8rem;
+}
