@@ -157,3 +157,62 @@ pre code {
   margin-top: 2rem;
   margin-bottom: 0.8rem;
 }
+
+/* Contenedor del bloque de código */
+.code-block {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin: 1.5rem 0;
+  overflow: hidden;
+}
+
+/* Encabezado del código (barra superior) */
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid var(--border);
+  padding: 0.4rem 0.8rem;
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+}
+
+.code-lang {
+  color: var(--muted);
+  text-transform: lowercase;
+}
+
+/* Botón de copiar */
+.copy-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  transition: all 0.2s ease;
+}
+
+.copy-btn:hover {
+  background: rgba(56, 139, 253, 0.15);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.copy-btn.copied {
+  border-color: var(--prompt);
+  color: var(--prompt);
+  background: rgba(63, 185, 80, 0.15);
+}
+
+/* Ajuste del bloque pre/code interno */
+.code-block pre {
+  margin: 0;
+  border: none;
+  background: transparent;
+  padding: 0.8rem 1rem;
+}

@@ -38,15 +38,33 @@ function renderPostList(container, posts) {
 }
 
 function loadAndRenderMarkdown(container, post) {
-  // Cargar el archivo .md
   fetch(`./${post.file}`)
     .then(res => {
       if (!res.ok) throw new Error('Archivo Markdown no encontrado');
       return res.text();
     })
     .then(markdownText => {
-      // Parsear el Markdown a HTML usando marked.js
-      const htmlContent = marked.parse(markdownText);
+      
+      // Personalizamos el renderizado de bloques de código en marked
+      const renderer = new marked.Renderer();
+      renderer.code = function({ text, lang }) {
+        const language = lang || 'bash';
+        // Escapamos comillas dobles y caracteres especiales para evitar romper el HTML
+        const safeText = text.replace(/"/g, '&quot;');
+        
+        return `
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-lang">${language}</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <pre><code class="language-${language}">${text}</code></pre>
+          </div>
+        `;
+      };
+
+      // Le decimos a marked que use nuestro renderer personalizado
+      const htmlContent = marked.parse(markdownText, { renderer });
 
       container.innerHTML = `
         <article>
@@ -69,4 +87,22 @@ function loadAndRenderMarkdown(container, post) {
       container.innerHTML = `<p class="post-meta">[error] No se pudo leer el archivo ${post.file}</p>`;
       console.error(err);
     });
+}
+
+// Función global para copiar el texto al portapapeles
+function copyCode(button) {
+  const codeBlock = button.closest('.code-block').querySelector('code');
+  const textToCopy = codeBlock.innerText;
+
+  navigator.clipboard.writeText(textToCopy).then(() => {
+    button.innerText = '¡Copiado!';
+    button.classList.add('copied');
+    
+    setTimeout(() => {
+      button.innerText = 'Copiar';
+      button.classList.remove('copied');
+    }, 2000);
+  }).catch(err => {
+    console.error('Error al copiar: ', err);
+  });
 }

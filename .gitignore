@@ -1,0 +1,7 @@
+# Archivos del Cpanel:
+.user.ini
+.htaccess
+.well-known
+
+# Personal
+manual.md
