@@ -68,16 +68,19 @@ function renderPostsList(posts) {
     const container = document.getElementById('posts-container');
     if (!container) return;
 
-    if (posts.length === 0) {
+    if (!posts || posts.length === 0) {
         container.innerHTML = '<p class="empty">No hay publicaciones disponibles.</p>';
         return;
     }
 
     container.innerHTML = posts.map(post => `
         <article class="post-card">
-            <h2><a href="?post=${post.slug}">${post.titulo}</a></h2>
+            <h2>
+                <!-- Usar post.slug para garantizar que leve el ID delante (ej: 10002A-optimizacion-kernel) -->
+                <a href="?post=${post.slug}">$ cat ${post.slug}.md</a>
+            </h2>
             <div class="post-meta">
-                <time>${post.fecha}</time> | <span>${post.categoria}</span>
+                <span>[${post.fecha}]</span> | <span>${post.categoria}</span>
             </div>
             <p>${post.extracto}</p>
         </article>
