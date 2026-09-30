@@ -1,106 +1,121 @@
 #!/usr/bin/env bash
 
+# Configuración de directorios
 POSTS_DIR="posts"
-OUTPUT_FILE="data/posts.json"
+DATA_DIR="data"
 
-if ! command -v python3 &> /dev/null; then
-    echo "❌ Python3 no está disponible."
-    exit 1
-fi
+# Asegurar que existe el directorio de datos
+mkdir -p "$DATA_DIR"
 
-mkdir -p data
+# Limpiar archivos de años previos en data/ para reescribirlos limpios
+rm -f "$DATA_DIR"/posts_*.json
+rm -f "$DATA_DIR"/years.json
 
-echo "🔍 Procesando entradas en '$POSTS_DIR'..."
+echo "🚀 Iniciando compilación del índice de posts..."
 
 python3 - << 'EOF'
 import os
-import re
 import json
+import re
 
 posts_dir = "posts"
-output_file = "data/posts.json"
+data_dir = "data"
 
-# 1. Cargar JSON previo si existe
-existing_posts = []
-if os.path.exists(output_file):
-    try:
-        with open(output_file, 'r', encoding='utf-8') as f:
-            existing_posts = json.load(f)
-    except Exception:
-        existing_posts = []
+if not os.path.exists(posts_dir):
+    print(f"❌ El directorio '{posts_dir}' no existe.")
+    exit(1)
 
-# Mapear IDs existentes para búsqueda rápida
-existing_ids = {str(post.get('id')) for post in existing_posts if 'id' in post}
-new_entries = []
+# Diccionario para agrupar entradas por año: {"2026": [...], "2025": [...]}
+posts_by_year = {}
+seen_ids = set()
 
-if os.path.exists(posts_dir):
-    for filename in sorted(os.listdir(posts_dir)):
-        if not filename.endswith('.md'):
-            continue
-        
+for filename in os.listdir(posts_dir):
+    if filename.endswith(".md"):
         filepath = os.path.join(posts_dir, filename)
+        
         with open(filepath, 'r', encoding='utf-8') as f:
             content = f.read()
 
-        # Extraer Frontmatter
-        match = re.search(r'^---\s*\n(.*?)\n---', content, re.DOTALL)
+        # Extraer Front Matter tipo YAML entre ---
+        match = re.match(r'^---\s*\n(.*?)\n---\s*\n', content, re.DOTALL)
         if not match:
-            print(f"⚠️  [OMITIDO] '{filename}' no tiene un Frontmatter YAML válido.")
+            print(f"⚠️  [OMITIDO] '{filename}' no tiene un encabezado Front Matter válido.")
             continue
 
-        frontmatter_text = match.group(1)
+        front_matter = match.group(1)
         data = {}
-        
-        # Parsea clave-valor básica
-        for line in frontmatter_text.splitlines():
+
+        # Parsear clave-valor simple
+        for line in front_matter.splitlines():
+            line = line.strip()
+            if not line or line.startswith('#'):
+                continue
             if ':' in line:
                 key, val = line.split(':', 1)
                 key = key.strip()
                 val = val.strip().strip('"').strip("'")
                 
-                # Manejo simple de tags en formato JSON/YAML inline
-                if key == 'tags':
-                    try:
-                        val = json.loads(val)
-                    except Exception:
-                        val = [t.strip().strip('"').strip("'") for t in val.strip('[]').split(',') if t.strip()]
-                
-                data[key] = val
+                # Saneamiento especial para arrays simples como tags: [linux, kernel]
+                if val.startswith('[') and val.endswith(']'):
+                    items = val[1:-1].split(',')
+                    data[key] = [i.strip().strip('"').strip("'") for i in items if i.strip()]
+                else:
+                    data[key] = val
 
         post_id = str(data.get('id', '')).strip()
+        raw_slug = str(data.get('slug', '')).strip()
+        fecha = str(data.get('fecha', '')).strip()
 
         if not post_id:
-            print(f"⚠️️  [OMITIDO] '{filename}' no define un campo 'id'.")
+            print(f"⚠️  [OMITIDO] '{filename}' no tiene ID.")
             continue
 
-        if post_id in existing_ids:
-            print(f"ℹ️  [YA EXISTE] ID '{post_id}' ({filename}) ya está registrado.")
+        if post_id in seen_ids:
+            print(f"⚠️  [DUPLICADO OMITIDO] ID '{post_id}' en '{filename}' ya fue procesado.")
             continue
 
-        # Estructurar entrada
+        seen_ids.add(post_id)
+
+        # Determinar el año del post
+        year = fecha.split('-')[0] if '-' in fecha else "sin_fecha"
+
+        # Formatear el slug como ID-slug (ejemplo: 10002A-optimizacion-kernel)
+        unique_slug = f"{post_id}-{raw_slug}" if raw_slug else f"post-{post_id}"
+
         entry = {
             "id": post_id,
-            "slug": data.get('slug', ''),
-            "type": "post",
+            "slug": unique_slug,  # <-- AQUÍ: antes decía raw_slug
+            "type": data.get('type', 'post'),
             "titulo": data.get('titulo', ''),
-            "fecha": data.get('fecha', ''),
+            "fecha": fecha,
             "categoria": data.get('categoria', ''),
             "tags": data.get('tags', []),
             "extracto": data.get('extracto', ''),
-            "file": filepath
+            "file": f"{posts_dir}/{filename}"
         }
 
-        new_entries.append(entry)
-        existing_ids.add(post_id)
-        print(f"✔  [ACOPLADO] ID: {post_id} - {entry['titulo']}")
+        if year not in posts_by_year:
+            posts_by_year[year] = []
+            
+        posts_by_year[year].append(entry)
 
-# Unir previos con nuevos y ordenar por fecha descendente
-all_posts = existing_posts + new_entries
-all_posts.sort(key=lambda x: str(x.get('fecha', '')), reverse=True)
+# Escribir los JSON por año y ordenar por fecha descendente
+all_years = sorted(list(posts_by_year.keys()), reverse=True)
 
-with open(output_file, 'w', encoding='utf-8') as f:
-    json.dump(all_posts, f, ensure_ascii=False, indent=2)
+for yr in all_years:
+    # Ordenar los posts dentro de cada año por fecha más reciente primero
+    posts_by_year[yr].sort(key=lambda x: x.get('fecha', ''), reverse=True)
+    
+    out_file = os.path.join(data_dir, f"posts_{yr}.json")
+    with open(out_file, 'w', encoding='utf-8') as f:
+        json.dump(posts_by_year[yr], f, ensure_ascii=False, indent=2)
+    print(f"✅ Generado: {out_file} ({len(posts_by_year[yr])} posts)")
 
-print("--------------------------------------------------")
-print(f"🚀 Proceso finalizado. Total acumulado en '{output_file}': {len(all_posts)}")
+# Guardar un archivo con la lista de años disponibles
+with open(os.path.join(data_dir, "years.json"), 'w', encoding='utf-8') as f:
+    json.dump(all_years, f, ensure_ascii=False, indent=2)
+
+print(f"✅ Generado: {data_dir}/years.json -> {all_years}")
 EOF
+
+echo "✨ Proceso de build completado con éxito."
