@@ -1,11 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. Obtener la ruta limpia de la URL (ej: '/blog/post-1' -> 'blog/post-1')
-    let currentPage = window.location.pathname.replace(/^\/|\/$/g, '');
-    if (!currentPage) {
-        currentPage = 'home';
-    }
+    // 1. Obtener la variable 'post' de la URL (?post=...)
+    const urlParams = new URLSearchParams(window.location.search);
+    const postSlug = urlParams.get('post');
 
-    // 2. Enviar la ruta exacta al backend PHP
+    // Si existe el parámetro post lo usa, de lo contrario asigna 'home'
+    const currentPage = postSlug ? postSlug.trim() : 'home';
+
+    // 2. Enviar el identificador a tracker.php
     fetch(`/api/tracker.php?page=${encodeURIComponent(currentPage)}`)
         .then(response => response.json())
         .then(data => {
@@ -15,11 +16,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (totalEl) totalEl.textContent = data.total_views.toLocaleString();
                 if (pageEl) pageEl.textContent = data.page_views.toLocaleString();
-
-                // Log descriptivo en consola del navegador
-                if (!data.is_new_view) {
-                    console.log(`Visita registrada en log, pero no sumada al contador (IP en enfriamiento de 1h para "${data.current_page}").`);
-                }
             }
         })
         .catch(err => console.error("Error al registrar visita:", err));
