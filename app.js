@@ -1,14 +1,14 @@
+// Inicialización única al cargar la página
 document.addEventListener("DOMContentLoaded", async () => {
     const urlParams = new URLSearchParams(window.location.search);
-    const postSlug = urlParams.get('post');
+    const postSlugParam = urlParams.get('post');
 
-    // 1. Cargar las publicaciones desde data/posts_YYYY.json
+    // 1. Cargar todas las publicaciones de los índices por año
     const allPosts = await loadAllPosts();
 
-    if (postSlug) {
-        // Modo Lectura de Artículo
-        const currentPost = allPosts.find(p => p.slug === postSlug);
-        
+    if (postSlugParam) {
+        // Modo Lectura de Artículo (soporta slug completo 10002A-slug o slug corto)
+        const currentPost = allPosts.find(p => p.slug === postSlugParam || p.slug.endsWith(`-${postSlugParam}`));
         if (currentPost) {
             renderPostContent(currentPost);
             trackPageView(currentPost.slug);
@@ -16,33 +16,34 @@ document.addEventListener("DOMContentLoaded", async () => {
             renderNotFound();
         }
     } else {
-        // Modo Inicio / Lista de Posts
+        // Modo Inicio / Listado Principal (ordenar más recientes primero)
+        allPosts.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
         renderPostsList(allPosts);
         trackPageView('home');
     }
 });
 
-// Cargar years.json y luego descargar todos los posts_YYYY.json
+// Función para cargar todos los posts desde los archivos anuales (data/posts_YYYY.json)
 async function loadAllPosts() {
     try {
+        // 1. Obtener la lista de años disponibles
         const yearsResponse = await fetch('/data/years.json');
-        if (!yearsResponse.ok) throw new Error("No se pudo obtener data/years.json");
-        
+        if (!yearsResponse.ok) throw new Error("No se pudo cargar data/years.json");
         const years = await yearsResponse.json();
 
-        // Cargar todos los archivos de años en paralelo
-        const fetchPromises = years.map(yr => 
+        // 2. Descargar todos los JSONs de cada año en paralelo
+        const fetchPromises = years.map(yr =>
             fetch(`/data/posts_${yr}.json`)
                 .then(res => res.ok ? res.json() : [])
                 .catch(() => [])
         );
 
         const results = await Promise.all(fetchPromises);
-        
-        # Aplanar todos los arrays en uno solo
+
+        // 3. Unir (aplanar) todos los arrays de publicaciones en uno solo
         return results.flat();
     } catch (error) {
-        console.error("Error cargando índice de posts:", error);
+        console.error("Error al cargar los posts:", error);
         return [];
     }
 }
@@ -76,7 +77,6 @@ function renderPostsList(posts) {
     container.innerHTML = posts.map(post => `
         <article class="post-card">
             <h2>
-                <!-- Usar post.slug para garantizar que leve el ID delante (ej: 10002A-optimizacion-kernel) -->
                 <a href="?post=${post.slug}">$ cat ${post.slug}.md</a>
             </h2>
             <div class="post-meta">
@@ -101,7 +101,6 @@ function renderPostContent(post) {
             // Eliminar el front matter YAML antes de convertir a HTML
             const cleanMarkdown = markdownText.replace(/^---\s*\n[\s\S]*?\n---\s*\n/, '');
             
-            // Si usas marked.js para renderizar Markdown:
             const htmlContent = typeof marked !== 'undefined' ? marked.parse(cleanMarkdown) : cleanMarkdown;
 
             container.innerHTML = `
