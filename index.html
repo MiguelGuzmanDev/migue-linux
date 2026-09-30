@@ -24,6 +24,34 @@
     <!-- Contenido inyectado dinámicamente -->
   </main>
 
+  <!-- Elementos HTML donde se mostrarán los contadores -->
+  <div class="view-counter">
+    <span>👁️ Visitas a esta página: <strong id="page-views">--</strong></span>
+    <span>🌐 Visitas totales: <strong id="total-views">--</strong></span>
+  </div>
+
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+      // Extraer la ruta actual (ej: /posts/mi-post -> mi-post)
+      const pathname = window.location.pathname.replace(/^\/|\/$/g, '');
+      const currentPage = pathname || 'home';
+
+      // Llamar al endpoint PHP enviando el nombre de la página
+      fetch(`/api/tracker.php?page=${encodeURIComponent(currentPage)}`)
+          .then(response => response.json())
+          .then(data => {
+              if (data.status === 'success') {
+                  const totalEl = document.getElementById('total-views');
+                  const pageEl = document.getElementById('page-views');
+
+                  if (totalEl) totalEl.textContent = data.total_views.toLocaleString();
+                  if (pageEl) pageEl.textContent = data.page_views.toLocaleString();
+              }
+          })
+          .catch(err => console.error("Error al registrar visita:", err));
+  });
+  </script>
+
   <script src="app.js"></script>
 </body>
 </html>
