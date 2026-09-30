@@ -26,24 +26,38 @@ document.addEventListener("DOMContentLoaded", async () => {
 // Función para cargar todos los posts desde los archivos anuales (data/posts_YYYY.json)
 async function loadAllPosts() {
     try {
-        // 1. Obtener la lista de años disponibles
-        const yearsResponse = await fetch('/data/years.json');
-        if (!yearsResponse.ok) throw new Error("No se pudo cargar data/years.json");
+        // Cargar años usando ruta relativa
+        const yearsResponse = await fetch('data/years.json');
+        if (!yearsResponse.ok) {
+            console.error("❌ No se encontró data/years.json. Estado HTTP:", yearsResponse.status);
+            return [];
+        }
+        
         const years = await yearsResponse.json();
+        console.log("📅 Años detectados:", years);
 
-        // 2. Descargar todos los JSONs de cada año en paralelo
-        const fetchPromises = years.map(yr =>
-            fetch(`/data/posts_${yr}.json`)
-                .then(res => res.ok ? res.json() : [])
-                .catch(() => [])
-        );
+        // Cargar cada archivo posts_YYYY.json
+        const fetchPromises = years.map(async yr => {
+            try {
+                const res = await fetch(`data/posts_${yr}.json`);
+                if (!res.ok) {
+                    console.warn(`⚠️ No se pudo cargar data/posts_${yr}.json`);
+                    return [];
+                }
+                return await res.json();
+            } catch (err) {
+                console.error(`❌ Error leyendo data/posts_${yr}.json:`, err);
+                return [];
+            }
+        });
 
         const results = await Promise.all(fetchPromises);
-
-        // 3. Unir (aplanar) todos los arrays de publicaciones en uno solo
-        return results.flat();
+        const mergedPosts = results.flat();
+        
+        console.log("✅ Total de posts cargados:", mergedPosts.length, mergedPosts);
+        return mergedPosts;
     } catch (error) {
-        console.error("Error al cargar los posts:", error);
+        console.error("❌ Error crítico en loadAllPosts:", error);
         return [];
     }
 }
