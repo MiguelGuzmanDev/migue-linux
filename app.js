@@ -1,108 +1,132 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const container = document.getElementById('content');
+document.addEventListener("DOMContentLoaded", async () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const postSlug = urlParams.get('post');
 
-  fetch('./data/posts.json')
-    .then(res => res.json())
-    .then(posts => {
-      const params = new URLSearchParams(window.location.search);
-      const activeSlug = params.get('post');
+    // 1. Cargar las publicaciones desde data/posts_YYYY.json
+    const allPosts = await loadAllPosts();
 
-      if (activeSlug) {
-        const post = posts.find(p => p.slug === activeSlug);
-        if (post) {
-          loadAndRenderMarkdown(container, post);
-          return;
+    if (postSlug) {
+        // Modo Lectura de Artículo
+        const currentPost = allPosts.find(p => p.slug === postSlug);
+        
+        if (currentPost) {
+            renderPostContent(currentPost);
+            trackPageView(currentPost.slug);
+        } else {
+            renderNotFound();
         }
-      }
-
-      renderPostList(container, posts);
-    })
-    .catch(err => {
-      container.innerHTML = '<p class="post-meta">[error] No se pudo cargar el índice de publicaciones.</p>';
-      console.error(err);
-    });
+    } else {
+        // Modo Inicio / Lista de Posts
+        renderPostsList(allPosts);
+        trackPageView('home');
+    }
 });
 
-function renderPostList(container, posts) {
-  container.innerHTML = posts.map(post => `
-    <article class="post-card">
-      <div class="post-meta">
-        [${post.fecha}] ${post.tags.map(t => `<span class="tag">#${t}</span>`).join('')}
-      </div>
-      <h2 class="post-title">
-        <a href="?post=${post.slug}">$ cat ${post.slug}.md</a>
-      </h2>
-      <p class="post-excerpt">${post.extracto}</p>
-    </article>
-  `).join('');
-}
-
-function loadAndRenderMarkdown(container, post) {
-  fetch(`./${post.file}`)
-    .then(res => {
-      if (!res.ok) throw new Error('Archivo Markdown no encontrado');
-      return res.text();
-    })
-    .then(markdownText => {
-      
-      // Personalizamos el renderizado de bloques de código en marked
-      const renderer = new marked.Renderer();
-      renderer.code = function({ text, lang }) {
-        const language = lang || 'bash';
-        // Escapamos comillas dobles y caracteres especiales para evitar romper el HTML
-        const safeText = text.replace(/"/g, '&quot;');
+// Cargar years.json y luego descargar todos los posts_YYYY.json
+async function loadAllPosts() {
+    try {
+        const yearsResponse = await fetch('/data/years.json');
+        if (!yearsResponse.ok) throw new Error("No se pudo obtener data/years.json");
         
-        return `
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-lang">${language}</span>
-              <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-            </div>
-            <pre><code class="language-${language}">${text}</code></pre>
-          </div>
-        `;
-      };
+        const years = await yearsResponse.json();
 
-      // Le decimos a marked que use nuestro renderer personalizado
-      const htmlContent = marked.parse(markdownText, { renderer });
+        // Cargar todos los archivos de años en paralelo
+        const fetchPromises = years.map(yr => 
+            fetch(`/data/posts_${yr}.json`)
+                .then(res => res.ok ? res.json() : [])
+                .catch(() => [])
+        );
 
-      container.innerHTML = `
-        <article>
-          <div class="post-meta" style="margin-bottom: 1.5rem;">
-            <a href="./" style="color: var(--accent); text-decoration: none;">← /home/sysadmin</a>
-            <br><br>
-            FILE: <strong>${post.file}</strong> | DATE: ${post.fecha}
-          </div>
-          <div style="margin-bottom: 1rem;">
-            ${post.tags.map(t => `<span class="tag">#${t}</span>`).join('')}
-          </div>
-          <hr style="border: 0; border-top: 1px solid var(--border); margin-bottom: 1.5rem;">
-          <div class="post-body">
-            ${htmlContent}
-          </div>
-        </article>
-      `;
-    })
-    .catch(err => {
-      container.innerHTML = `<p class="post-meta">[error] No se pudo leer el archivo ${post.file}</p>`;
-      console.error(err);
-    });
+        const results = await Promise.all(fetchPromises);
+        
+        # Aplanar todos los arrays en uno solo
+        return results.flat();
+    } catch (error) {
+        console.error("Error cargando índice de posts:", error);
+        return [];
+    }
 }
 
-// Función global para copiar el texto al portapapeles
-function copyCode(button) {
-  const codeBlock = button.closest('.code-block').querySelector('code');
-  const textToCopy = codeBlock.innerText;
+// Función para registrar la vista en api/tracker.php
+function trackPageView(pageIdentifier) {
+    fetch(`/api/tracker.php?page=${encodeURIComponent(pageIdentifier)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const totalEl = document.getElementById('total-views');
+                const pageEl = document.getElementById('page-views');
 
-  navigator.clipboard.writeText(textToCopy).then(() => {
-    button.innerText = '¡Copiado!';
-    button.classList.add('copied');
-    
-    setTimeout(() => {
-      button.innerText = 'Copiar';
-      button.classList.remove('copied');
-    }, 2000);
-  }).catch(err => {
-    console.error('Error al copiar: ', err);
-  });
+                if (totalEl) totalEl.textContent = Number(data.total_views).toLocaleString();
+                if (pageEl) pageEl.textContent = Number(data.page_views).toLocaleString();
+            }
+        })
+        .catch(err => console.error("Error en tracker:", err));
+}
+
+// Renderizar la lista principal de entradas
+function renderPostsList(posts) {
+    const container = document.getElementById('posts-container');
+    if (!container) return;
+
+    if (posts.length === 0) {
+        container.innerHTML = '<p class="empty">No hay publicaciones disponibles.</p>';
+        return;
+    }
+
+    container.innerHTML = posts.map(post => `
+        <article class="post-card">
+            <h2><a href="?post=${post.slug}">${post.titulo}</a></h2>
+            <div class="post-meta">
+                <time>${post.fecha}</time> | <span>${post.categoria}</span>
+            </div>
+            <p>${post.extracto}</p>
+        </article>
+    `).join('');
+}
+
+// Renderizar el contenido Markdown de un post específico
+function renderPostContent(post) {
+    const container = document.getElementById('posts-container');
+    if (!container) return;
+
+    fetch(`/${post.file}`)
+        .then(res => {
+            if (!res.ok) throw new Error("Archivo Markdown no encontrado");
+            return res.text();
+        })
+        .then(markdownText => {
+            // Eliminar el front matter YAML antes de convertir a HTML
+            const cleanMarkdown = markdownText.replace(/^---\s*\n[\s\S]*?\n---\s*\n/, '');
+            
+            // Si usas marked.js para renderizar Markdown:
+            const htmlContent = typeof marked !== 'undefined' ? marked.parse(cleanMarkdown) : cleanMarkdown;
+
+            container.innerHTML = `
+                <article class="post-single">
+                    <h1>${post.titulo}</h1>
+                    <div class="post-meta">
+                        <time>${post.fecha}</time> | <span>${post.categoria}</span>
+                    </div>
+                    <div class="post-body">${htmlContent}</div>
+                    <a href="/" class="back-link">&larr; Volver al inicio</a>
+                </article>
+            `;
+        })
+        .catch(err => {
+            console.error(err);
+            renderNotFound();
+        });
+}
+
+function renderNotFound() {
+    const container = document.getElementById('posts-container');
+    if (container) {
+        container.innerHTML = `
+            <div class="not-found">
+                <h2>404 - Publicación no encontrada</h2>
+                <p>El artículo solicitado no existe o fue movido.</p>
+                <a href="/">&larr; Volver al inicio</a>
+            </div>
+        `;
+    }
 }
