@@ -1,14 +1,18 @@
-// Inicialización única al cargar la página
 document.addEventListener("DOMContentLoaded", async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const postSlugParam = urlParams.get('post');
 
-    // 1. Cargar todas las publicaciones de los índices por año
+    // 1. Cargar publicaciones desde data/posts_YYYY.json
     const allPosts = await loadAllPosts();
 
     if (postSlugParam) {
-        // Modo Lectura de Artículo (soporta slug completo 10002A-slug o slug corto)
-        const currentPost = allPosts.find(p => p.slug === postSlugParam || p.slug.endsWith(`-${postSlugParam}`));
+        // Modo lectura de post: busca por slug exacto (10002A-optimizacion-kernel)
+        const currentPost = allPosts.find(p => 
+            p.slug === postSlugParam || 
+            p.slug.endsWith(`-${postSlugParam}`) ||
+            p.id === postSlugParam
+        );
+
         if (currentPost) {
             renderPostContent(currentPost);
             trackPageView(currentPost.slug);
@@ -16,55 +20,48 @@ document.addEventListener("DOMContentLoaded", async () => {
             renderNotFound();
         }
     } else {
-        // Modo Inicio / Listado Principal (ordenar más recientes primero)
+        // Modo inicio / listado principal (ordenar por fecha descendente)
         allPosts.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
         renderPostsList(allPosts);
         trackPageView('home');
     }
 });
 
-// Función para cargar todos los posts desde los archivos anuales (data/posts_YYYY.json)
+// Cargar years.json y los posts por año correspondientes
 async function loadAllPosts() {
     try {
-        // Cargar años usando ruta relativa
-        const yearsResponse = await fetch('data/years.json');
-        if (!yearsResponse.ok) {
-            console.error("❌ No se encontró data/years.json. Estado HTTP:", yearsResponse.status);
-            return [];
-        }
+        // Forzar recarga sin caché local agregando timestamp
+        const cacheBuster = `?v=${Date.now()}`;
         
-        const years = await yearsResponse.json();
-        console.log("📅 Años detectados:", years);
+        const yearsResponse = await fetch(`data/years.json${cacheBuster}`);
+        if (!yearsResponse.ok) {
+            throw new Error(`HTTP ${yearsResponse.status} leyendo data/years.json`);
+        }
 
-        // Cargar cada archivo posts_YYYY.json
-        const fetchPromises = years.map(async yr => {
+        const years = await yearsResponse.json();
+
+        // Cargar en paralelo todos los data/posts_YYYY.json
+        const fetchPromises = years.map(async (yr) => {
             try {
-                const res = await fetch(`data/posts_${yr}.json`);
-                if (!res.ok) {
-                    console.warn(`⚠️ No se pudo cargar data/posts_${yr}.json`);
-                    return [];
-                }
-                return await res.json();
+                const res = await fetch(`data/posts_${yr}.json${cacheBuster}`);
+                return res.ok ? await res.json() : [];
             } catch (err) {
-                console.error(`❌ Error leyendo data/posts_${yr}.json:`, err);
+                console.warn(`Error al leer data/posts_${yr}.json:`, err);
                 return [];
             }
         });
 
         const results = await Promise.all(fetchPromises);
-        const mergedPosts = results.flat();
-        
-        console.log("✅ Total de posts cargados:", mergedPosts.length, mergedPosts);
-        return mergedPosts;
+        return results.flat();
     } catch (error) {
-        console.error("❌ Error crítico en loadAllPosts:", error);
+        console.error("❌ [error] No se pudo cargar el índice de publicaciones:", error);
         return [];
     }
 }
 
-// Función para registrar la vista en api/tracker.php
+// Registrar métrica de vistas en api/tracker.php
 function trackPageView(pageIdentifier) {
-    fetch(`/api/tracker.php?page=${encodeURIComponent(pageIdentifier)}`)
+    fetch(`api/tracker.php?page=${encodeURIComponent(pageIdentifier)}`)
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
@@ -78,7 +75,7 @@ function trackPageView(pageIdentifier) {
         .catch(err => console.error("Error en tracker:", err));
 }
 
-// Renderizar la lista principal de entradas
+// Renderizar lista en index.html
 function renderPostsList(posts) {
     const container = document.getElementById('posts-container');
     if (!container) return;
@@ -101,20 +98,18 @@ function renderPostsList(posts) {
     `).join('');
 }
 
-// Renderizar el contenido Markdown de un post específico
+// Renderizar contenido del post individual
 function renderPostContent(post) {
     const container = document.getElementById('posts-container');
     if (!container) return;
 
-    fetch(`/${post.file}`)
+    fetch(post.file)
         .then(res => {
             if (!res.ok) throw new Error("Archivo Markdown no encontrado");
             return res.text();
         })
         .then(markdownText => {
-            // Eliminar el front matter YAML antes de convertir a HTML
             const cleanMarkdown = markdownText.replace(/^---\s*\n[\s\S]*?\n---\s*\n/, '');
-            
             const htmlContent = typeof marked !== 'undefined' ? marked.parse(cleanMarkdown) : cleanMarkdown;
 
             container.innerHTML = `

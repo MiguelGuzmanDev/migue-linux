@@ -15,21 +15,6 @@
     "file": "posts/optimizacion-kernel.md"
   },
   {
-    "id": "10004A",
-    "slug": "10004A-optimizacion-kernel",
-    "type": "post",
-    "titulo": "Ajuste de parámetros sysctl para servidores de alto tráfico",
-    "fecha": "2026-09-28",
-    "categoria": "sysadmin",
-    "tags": [
-      "linux",
-      "kernel",
-      "sysctl"
-    ],
-    "extracto": "Optimizando somaxconn y TCP reuse para evitar cuellos de botella.",
-    "file": "posts/optimizacion-kernel2.md"
-  },
-  {
     "id": "103A",
     "slug": "103A-optimizacion-kernel",
     "type": "post",
