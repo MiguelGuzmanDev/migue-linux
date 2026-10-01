@@ -1,7 +1,7 @@
 ---
-id: 104B
-slug: optimizacion-kernel
-titulo: Ajuste de parámetros sysctl para servidores de alto tráfico
+id: 100A
+slug: optimizacion-kernel-v2
+titulo: Ajuste de parámetros sysctl para servidores de alto tráfico andas
 fecha: 2026-09-28
 categoria: sysadmin
 tags: ["linux", "kernel", "sysctl"]

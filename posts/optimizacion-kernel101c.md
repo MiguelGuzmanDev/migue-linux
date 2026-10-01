@@ -1,5 +1,5 @@
 ---
-id: 104B
+id: 101C
 slug: optimizacion-kernel
 titulo: Ajuste de parámetros sysctl para servidores de alto tráfico
 fecha: 2026-09-28

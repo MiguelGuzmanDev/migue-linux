@@ -1,0 +1,47 @@
+[
+  {
+    "id": "105A",
+    "titulo": "Ajuste de parámetros sysctl para servidores de alto tráfico",
+    "fecha": "2026-10-01",
+    "categoria": "sysadmin",
+    "extracto": "Optimizando somaxconn y TCP reuse para evitar cuellos de botella.",
+    "tags": [
+      "linux",
+      "kernel",
+      "sysctl"
+    ],
+    "type": "post",
+    "slug": "105A-optimizacion-kernel105A",
+    "file": "posts/optimizacion-kernel105A.md"
+  },
+  {
+    "id": "107A",
+    "titulo": "Ajuste de parámetros sysctl para servidores de alto tráfico",
+    "fecha": "2026-10-01",
+    "categoria": "sysadmin",
+    "extracto": "Optimizando somaxconn y TCP reuse para evitar cuellos de botella.",
+    "tags": [
+      "linux",
+      "kernel",
+      "sysctl"
+    ],
+    "type": "post",
+    "slug": "107A-optimizacion-kernel107A",
+    "file": "posts/optimizacion-kernel107A.md"
+  },
+  {
+    "id": "106D",
+    "titulo": "Ajuste de parámetros sysctl para servidores de alto tráfico",
+    "fecha": "2026-10-01",
+    "categoria": "sysadmin",
+    "extracto": "Optimizando somaxconn y TCP reuse para evitar cuellos de botella.",
+    "tags": [
+      "linux",
+      "kernel",
+      "sysctl"
+    ],
+    "type": "post",
+    "slug": "106D-optimizacion-kernel106A",
+    "file": "posts/optimizacion-kernel106A.md"
+  }
+]

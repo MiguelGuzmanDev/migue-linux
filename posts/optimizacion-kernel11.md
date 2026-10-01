@@ -1,10 +1,10 @@
 ---
-id: 104B
-slug: optimizacion-kernel
+id: 111A
+slug: optimizacion-kernel-clon
 titulo: Ajuste de parámetros sysctl para servidores de alto tráfico
 fecha: 2026-09-28
 categoria: sysadmin
-tags: ["linux", "kernel", "sysctl"]
+tags: ["linux", "kernel", "sysctl","otro","uttt"]
 extracto: Optimizando somaxconn y TCP reuse para evitar cuellos de botella.
 ---
 
