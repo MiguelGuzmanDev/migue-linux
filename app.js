@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // 1. Cargar publicaciones desde data/posts_YYYY.json
     const allPosts = await loadAllPosts();
+    console.log("📌 Posts cargados:", allPosts); // <--- AGREGAR ESTA LÍNEA
 
     if (postSlugParam) {
         // Modo lectura de post: busca por slug exacto (10002A-optimizacion-kernel)
@@ -78,24 +79,36 @@ function trackPageView(pageIdentifier) {
 // Renderizar lista en index.html
 function renderPostsList(posts) {
     const container = document.getElementById('posts-container');
-    if (!container) return;
+    if (!container) {
+        console.error("❌ No se encontró el elemento <div id=\"posts-container\"> en index.html");
+        return;
+    }
 
     if (!posts || posts.length === 0) {
         container.innerHTML = '<p class="empty">No hay publicaciones disponibles.</p>';
         return;
     }
 
-    container.innerHTML = posts.map(post => `
-        <article class="post-card">
-            <h2>
-                <a href="?post=${post.slug}">$ cat ${post.slug}.md</a>
-            </h2>
-            <div class="post-meta">
-                <span>[${post.fecha}]</span> | <span>${post.categoria}</span>
-            </div>
-            <p>${post.extracto}</p>
-        </article>
-    `).join('');
+    container.innerHTML = posts.map(post => {
+        // Fallbacks por si las propiedades del JSON varían entre español e inglés
+        const title = post.titulo || post.title || post.slug;
+        const excerpt = post.extracto || post.excerpt || '';
+        const date = post.fecha || post.date || '';
+        const category = post.categoria || post.category || 'General';
+        const postSlug = post.slug || post.id;
+
+        return `
+            <article class="post-card">
+                <h2>
+                    <a href="?post=${postSlug}">$ cat ${postSlug}.md</a>
+                </h2>
+                <div class="post-meta">
+                    <span>[${date}]</span> | <span>${category}</span>
+                </div>
+                <p>${excerpt}</p>
+            </article>
+        `;
+    }).join('');
 }
 
 // Renderizar contenido del post individual
