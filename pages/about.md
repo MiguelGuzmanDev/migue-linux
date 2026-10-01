@@ -1,14 +1,19 @@
 # miguelguzman@migue-linux:~$ cat ~/about.md
 
+![Miguel Ángel Guzmán Pérez - Profile Photo](../assets/img/pages/miguel-guzman.jpeg)
+
 ```bash
-USER      : Miguel Ángel Guzmán Pérez
-ROLE      : Senior Linux Systems Engineer | SysOps / SRE
-LOCATION  : CDMX / Oaxaca, México
-PHONE     : (953) 123 96 83
-EMAIL     : miguel020909@gmail.com
-GITHUB    : github.com/MiguelGuzmanDev
-LINKEDIN  : linkedin.com/in/mguzmanp
-STATUS    : Open for SysOps, SRE & Cloud Infrastructure Challenges
+miguelguzman@migue-linux:~$ fastfetch --profile
+
+       /\_/\         USER      : Miguel Ángel Guzmán Pérez
+      ( o.o )        ROLE      : Senior Linux Systems Engineer | SysOps / SRE
+       > ^ <         LOCATION  : CDMX / Oaxaca, México
+                     PHONE     : (953) 123 96 83
+                     EMAIL     : miguel020909@gmail.com
+                     GITHUB    : [https://github.com/MiguelGuzmanDev](https://github.com/MiguelGuzmanDev)
+                     LINKEDIN  : [https://linkedin.com/in/mguzmanp](https://linkedin.com/in/mguzmanp)
+                     STATUS    : Open for SysOps, SRE & Cloud Challenges
+                     UPTIME    : 7+ Years Operating Production Infrastructure
 ```
 
 
@@ -19,7 +24,6 @@ Ingeniero de Sistemas Linux Senior con **más de 7 años de experiencia** operan
 
 Experiencia demostrada en administración de nube con **OpenStack**, orquestación de bases de datos relacionales y NoSQL, arquitecturas de respaldo automatizado (**Bacula**) y resolución de incidentes complejos (*troubleshooting Nivel 3*). Apasionado por la modernización tecnológica, containerización y cultura DevOps.
 
----
 
 ## 🛠 TECH_STACK & CORE_SKILLS
 
@@ -32,7 +36,6 @@ Experiencia demostrada en administración de nube con **OpenStack**, orquestaci�
 [ Databases & Storage ] ➜ PostgreSQL (HA), MySQL / MariaDB, MongoDB (HA), Bacula (Enterprise & Community), PITR
 ```
 
----
 
 ## ⚙️ WORK_EXPERIENCE
 
@@ -46,7 +49,6 @@ Experiencia demostrada en administración de nube con **OpenStack**, orquestaci�
 * **Gestión Multi-Stack:** Soporte a aplicaciones gubernamentales desarrolladas en PHP (Laravel, WordPress, Moodle, CodeIgniter), Python (Django), JavaScript (Node.js/Express), Java (WildFly) y Ruby.
 * **Troubleshooting & Automatización:** Mantenimiento preventivo y tareas repetitivas mediante desarrollo avanzado en **Bash**. Mantenimiento de tiempos mínimos de recuperación (MTTR) resolviendo incidentes técnicos de Nivel 3 en producción.
 
----
 
 ## 🔬 TECHNICAL_PROJECTS & LABS (SYSOPS / SRE)
 
@@ -70,7 +72,6 @@ Experiencia demostrada en administración de nube con **OpenStack**, orquestaci�
 * **Tech:** Icinga2, Bash, SSH, Telegram Bot API.
 * **Descripción:** Solución interna de monitoreo basada en Icinga2 con plugins personalizados, recolección vía SSH y un pipeline de alertas en tiempo real integrado con Telegram.
 
----
 
 ## 🎓 EDUCATION & FORMATION
 
