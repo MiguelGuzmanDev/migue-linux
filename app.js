@@ -4,6 +4,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const postsContainer = document.getElementById("posts-container");
 
   let allPosts = [];
+  let currentFilteredPosts = [];
+  let currentPage = 1;
+  const postsPerPage = 5; // Cantidad de publicaciones por página
+
+  // Contenedor dinámico de paginación
+  const paginationContainer = document.createElement("div");
+  paginationContainer.id = "pagination-container";
+  paginationContainer.className = "pagination-bar";
+  postsContainer.after(paginationContainer);
 
   // 1. Cargar Páginas Estáticas (data/pages.json)
   fetch("data/pages.json")
@@ -65,6 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!postsByMonth) return;
 
       allPosts = postsByMonth.flat();
+      currentFilteredPosts = allPosts;
 
       const urlParams = new URLSearchParams(window.location.search);
       const pageSlug = urlParams.get("page");
@@ -72,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (pageSlug) {
         renderStaticPage(pageSlug);
       } else {
-        renderPosts(allPosts);
+        renderPosts(currentFilteredPosts);
       }
     })
     .catch((err) => {
@@ -85,13 +95,15 @@ document.addEventListener("DOMContentLoaded", () => {
     targetBtn.classList.add("active");
 
     if (!categoryName) {
-      renderPosts(allPosts);
+      currentFilteredPosts = allPosts;
     } else {
-      const filtered = allPosts.filter(
+      currentFilteredPosts = allPosts.filter(
         (post) => post.categoria && post.categoria.toLowerCase() === categoryName.toLowerCase()
       );
-      renderPosts(filtered);
     }
+
+    currentPage = 1; // Reiniciar a la primera página al filtrar
+    renderPosts(currentFilteredPosts);
   }
 
   function renderPosts(posts) {
@@ -99,10 +111,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (posts.length === 0) {
       postsContainer.innerHTML = "<p class='no-posts'>No hay publicaciones en esta categoría.</p>";
+      paginationContainer.innerHTML = "";
       return;
     }
 
-    posts.forEach((post) => {
+    // Paginación: cortar el array de publicaciones según la página actual
+    const startIndex = (currentPage - 1) * postsPerPage;
+    const endIndex = startIndex + postsPerPage;
+    const postsToShow = posts.slice(startIndex, endIndex);
+
+    postsToShow.forEach((post) => {
       const article = document.createElement("article");
       article.className = "post-card";
 
@@ -125,9 +143,54 @@ document.addEventListener("DOMContentLoaded", () => {
 
       postsContainer.appendChild(article);
     });
+
+    renderPaginationControls(posts.length);
+  }
+
+  function renderPaginationControls(totalItems) {
+    const totalPages = Math.ceil(totalItems / postsPerPage);
+    paginationContainer.innerHTML = "";
+
+    if (totalPages <= 1) return;
+
+    // Botón Anterior
+    const prevBtn = document.createElement("button");
+    prevBtn.className = "pagination-btn";
+    prevBtn.textContent = "[ <-- Anterior ]";
+    prevBtn.disabled = currentPage === 1;
+    prevBtn.addEventListener("click", () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderPosts(currentFilteredPosts);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    });
+
+    // Estado de la página
+    const pageIndicator = document.createElement("span");
+    pageIndicator.className = "pagination-info";
+    pageIndicator.textContent = `Página ${currentPage} de ${totalPages}`;
+
+    // Botón Siguiente
+    const nextBtn = document.createElement("button");
+    nextBtn.className = "pagination-btn";
+    nextBtn.textContent = "[ Siguiente --> ]";
+    nextBtn.disabled = currentPage === totalPages;
+    nextBtn.addEventListener("click", () => {
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderPosts(currentFilteredPosts);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    });
+
+    paginationContainer.appendChild(prevBtn);
+    paginationContainer.appendChild(pageIndicator);
+    paginationContainer.appendChild(nextBtn);
   }
 
   function renderStaticPage(slug) {
+    paginationContainer.innerHTML = ""; // Ocultar controles de paginación en páginas estáticas
     fetch("data/pages.json")
       .then((res) => res.json())
       .then((pages) => {
