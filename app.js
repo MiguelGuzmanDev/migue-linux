@@ -118,8 +118,8 @@ document.addEventListener("DOMContentLoaded", () => {
         <h2><a href="${post.file}">cat ${fileName}</a></h2>
         <p class="post-extract">${post.extracto}</p>
         <div class="post-meta">
-          <span class="post-date">${post.fecha}</span>
           ${tagsHTML}
+          <span class="post-date">${post.fecha}</span>
         </div>
       `;
 
