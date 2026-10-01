@@ -4,12 +4,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const postsContainer = document.getElementById("posts-container");
 
   let allPosts = [];
-  let selectedCategory = null;
 
   // 1. Cargar Páginas Estáticas (data/pages.json)
   fetch("data/pages.json")
     .then((res) => res.json())
     .then((pages) => {
+      pagesNav.innerHTML = "";
       pages.forEach((page) => {
         const link = document.createElement("a");
         link.href = `?page=${page.slug}`;
@@ -17,18 +17,19 @@ document.addEventListener("DOMContentLoaded", () => {
         pagesNav.appendChild(link);
       });
     })
-    .catch((err) => console.error("Error al cargar data/pages.json:", err));
+    .catch((err) => console.error("Error cargando pages.json:", err));
 
   // 2. Cargar Categorías (data/categories.json)
   fetch("data/categories.json")
     .then((res) => res.json())
     .then((categories) => {
-      categoriesBar.innerHTML = ""; // Limpiar contenedor
+      if (!categoriesBar) return;
+      categoriesBar.innerHTML = "";
 
-      // Botón para mostrar "Todas"
+      // Botón [ todas ]
       const allBtn = document.createElement("button");
       allBtn.className = "category-btn active";
-      allBtn.textContent = "Todas";
+      allBtn.textContent = "[ todas ]";
       allBtn.addEventListener("click", () => filterByCategory(null, allBtn));
       categoriesBar.appendChild(allBtn);
 
@@ -36,15 +37,14 @@ document.addEventListener("DOMContentLoaded", () => {
       categories.forEach((cat) => {
         const btn = document.createElement("button");
         btn.className = "category-btn";
-        btn.textContent = cat.nombre;
-        btn.dataset.category = cat.nombre;
+        btn.textContent = `[ ${cat.nombre.toLowerCase()} ]`;
         btn.addEventListener("click", () => filterByCategory(cat.nombre, btn));
         categoriesBar.appendChild(btn);
       });
     })
-    .catch((err) => console.error("Error al cargar data/categories.json:", err));
+    .catch((err) => console.error("Error cargando categories.json:", err));
 
-  // 3. Obtener el índice de meses (data/months.json) y cargar las publicaciones
+  // 3. Cargar publicaciones (data/months.json)
   fetch("data/months.json")
     .then((res) => res.json())
     .then((months) => {
@@ -53,7 +53,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // Cargar los JSON de cada mes disponible en paralelo
       const fetchPromises = months.map((month) =>
         fetch(`data/posts_${month}.json`)
           .then((res) => (res.ok ? res.json() : []))
@@ -65,10 +64,8 @@ document.addEventListener("DOMContentLoaded", () => {
     .then((postsByMonth) => {
       if (!postsByMonth) return;
 
-      // Unificar todas las entradas en un único array
       allPosts = postsByMonth.flat();
 
-      // Verificar si hay parámetro de página estática (?page=about)
       const urlParams = new URLSearchParams(window.location.search);
       const pageSlug = urlParams.get("page");
 
@@ -79,39 +76,29 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     })
     .catch((err) => {
-      console.error("Error al cargar el feed de publicaciones:", err);
+      console.error("Error al cargar las publicaciones:", err);
       postsContainer.innerHTML = "<p>Error al cargar las publicaciones.</p>";
     });
 
-  // Filtrar publicaciones por categoría sin recargar la página
   function filterByCategory(categoryName, targetBtn) {
-    selectedCategory = categoryName;
-
-    // Actualizar estado 'active' en botones
-    document.querySelectorAll(".category-btn").forEach((btn) => {
-      btn.classList.remove("active");
-    });
+    document.querySelectorAll(".category-btn").forEach((btn) => btn.classList.remove("active"));
     targetBtn.classList.add("active");
 
-    if (!selectedCategory) {
+    if (!categoryName) {
       renderPosts(allPosts);
     } else {
       const filtered = allPosts.filter(
-        (post) =>
-          post.categoria &&
-          post.categoria.toLowerCase() === selectedCategory.toLowerCase()
+        (post) => post.categoria && post.categoria.toLowerCase() === categoryName.toLowerCase()
       );
       renderPosts(filtered);
     }
   }
 
-  // Renderizar la lista de entradas en el DOM
   function renderPosts(posts) {
     postsContainer.innerHTML = "";
 
     if (posts.length === 0) {
-      postsContainer.innerHTML =
-        "<p class='no-posts'>No se encontraron publicaciones en esta categoría.</p>";
+      postsContainer.innerHTML = "<p class='no-posts'>No hay publicaciones en esta categoría.</p>";
       return;
     }
 
@@ -119,12 +106,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const article = document.createElement("article");
       article.className = "post-card";
 
-      const tagsHTML =
-        post.tags && post.tags.length > 0
-          ? `<div class="post-tags">${post.tags
-              .map((tag) => `<span class="tag">#${tag}</span>`)
-              .join(" ")}</div>`
-          : "";
+      const tagsHTML = post.tags && post.tags.length > 0
+        ? `<div class="post-tags">${post.tags.map((t) => `<span class="tag">#${t}</span>`).join(" ")}</div>`
+        : "";
 
       article.innerHTML = `
         <header class="post-header">
@@ -141,25 +125,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Cargar y convertir una página Markdown estática (ej: pages/about.md)
   function renderStaticPage(slug) {
-    fetch(`data/pages.json`)
+    fetch("data/pages.json")
       .then((res) => res.json())
       .then((pages) => {
         const pageInfo = pages.find((p) => p.slug === slug);
-        if (!pageInfo) {
-          postsContainer.innerHTML = "<h2>404 - Página no encontrada</h2>";
-          return;
-        }
-
+        if (!pageInfo) throw new Error("Página no registrada");
         return fetch(pageInfo.file);
       })
-      .then((res) => {
-        if (!res.ok) throw new Error("Página no encontrada");
-        return res.text();
-      })
+      .then((res) => res.text())
       .then((mdContent) => {
-        // Remover el Front Matter si existe antes de renderizar con marked
         const cleanMd = mdContent.replace(/^---[\s\S]*?---\s*/, "");
         postsContainer.innerHTML = `<div class="static-page">${marked.parse(cleanMd)}</div>`;
       })
