@@ -216,3 +216,23 @@ pre code {
   background: transparent;
   padding: 0.8rem 1rem;
 }
+
+/* Resetear el color y estilo global de los enlaces */
+a, 
+a:-webkit-any-link {
+    color: inherit; /* Hereda el color del texto contenedor */
+    text-decoration: none; /* Quita el subrayado feo */
+}
+
+/* Estilo específico para los títulos de las publicaciones */
+.post-card h2 a {
+    color: #00ff66; /* Verde tipo consola/terminal (o el color que use tu tema) */
+    font-weight: bold;
+    transition: color 0.2s ease;
+}
+
+/* Efecto hover (al pasar el cursor) */
+.post-card h2 a:hover {
+    color: #ffffff;
+    text-decoration: underline;
+}
