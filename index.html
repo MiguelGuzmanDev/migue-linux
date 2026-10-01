@@ -31,18 +31,30 @@
     <!-- Contenido inyectado dinámicamente mediante app.js -->
   </main>
 
-  <!-- Métricas y contadores estilo Terminal Bash -->
-  <div id="visitor-counter" class="bash-stats-box">
-    <pre class="ascii-box">
-+--------------------------------------------------+
-| <span class="prompt">miguelguzman@Oaxaqueando:~$</span> echo$SYS_METRICS    |
-+--------------------------------------------------+
-| PAGE_VIEWS   : <span id="page-views" class="val">--</span>                          |
-| TOTAL_VISITS : <span id="total-views" class="val">--</span>                          |
-| STATUS       : <span id="sys-status" class="status">ONLINE [200 OK]</span>           |
-+--------------------------------------------------+
-</pre>
-  </div>
+  <!-- Métricas estilo terminal bash (Neofetch / CLI) -->
+  <footer class="cli-footer">
+    <div class="terminal-card">
+      <div class="terminal-header">
+        <span class="btn-close"></span>
+        <span class="btn-min"></span>
+        <span class="btn-max"></span>
+        <span class="terminal-title">bash - 80x24</span>
+      </div>
+      <div class="terminal-body">
+        <div class="cli-line">
+          <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> <span class="command">./metrics.sh --summary</span>
+        </div>
+        <div class="cli-output">
+          <div class="metric-row"><span class="key">PAGE_VIEWS   :</span> <span id="page-views" class="val">--</span></div>
+          <div class="metric-row"><span class="key">TOTAL_VISITS :</span> <span id="total-views" class="val">--</span></div>
+          <div class="metric-row"><span class="key">SYSTEM_STATUS:</span> <span id="sys-status" class="status-ok">ONLINE [200 OK]</span></div>
+        </div>
+        <div class="cli-line prompt-footer">
+          <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> <span class="cursor">_</span>
+        </div>
+      </div>
+    </div>
+  </footer>
 
   <script>
 document.addEventListener("DOMContentLoaded", () => {
