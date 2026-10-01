@@ -1,157 +1,170 @@
-document.addEventListener("DOMContentLoaded", async () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const postSlugParam = urlParams.get('post');
+document.addEventListener("DOMContentLoaded", () => {
+  const categoriesBar = document.getElementById("categories-bar");
+  const pagesNav = document.getElementById("pages-nav");
+  const postsContainer = document.getElementById("posts-container");
 
-    // 1. Cargar publicaciones desde data/posts_YYYY.json
-    const allPosts = await loadAllPosts();
-    console.log("📌 Posts cargados:", allPosts); // <--- AGREGAR ESTA LÍNEA
+  let allPosts = [];
+  let selectedCategory = null;
 
-    if (postSlugParam) {
-        // Modo lectura de post: busca por slug exacto (10002A-optimizacion-kernel)
-        const currentPost = allPosts.find(p => 
-            p.slug === postSlugParam || 
-            p.slug.endsWith(`-${postSlugParam}`) ||
-            p.id === postSlugParam
-        );
+  // 1. Cargar Páginas Estáticas (data/pages.json)
+  fetch("data/pages.json")
+    .then((res) => res.json())
+    .then((pages) => {
+      pages.forEach((page) => {
+        const link = document.createElement("a");
+        link.href = `?page=${page.slug}`;
+        link.textContent = `[ ~/${page.slug} ]`;
+        pagesNav.appendChild(link);
+      });
+    })
+    .catch((err) => console.error("Error al cargar data/pages.json:", err));
 
-        if (currentPost) {
-            renderPostContent(currentPost);
-            trackPageView(currentPost.slug);
-        } else {
-            renderNotFound();
-        }
+  // 2. Cargar Categorías (data/categories.json)
+  fetch("data/categories.json")
+    .then((res) => res.json())
+    .then((categories) => {
+      categoriesBar.innerHTML = ""; // Limpiar contenedor
+
+      // Botón para mostrar "Todas"
+      const allBtn = document.createElement("button");
+      allBtn.className = "category-btn active";
+      allBtn.textContent = "Todas";
+      allBtn.addEventListener("click", () => filterByCategory(null, allBtn));
+      categoriesBar.appendChild(allBtn);
+
+      // Botones por categoría
+      categories.forEach((cat) => {
+        const btn = document.createElement("button");
+        btn.className = "category-btn";
+        btn.textContent = cat.nombre;
+        btn.dataset.category = cat.nombre;
+        btn.addEventListener("click", () => filterByCategory(cat.nombre, btn));
+        categoriesBar.appendChild(btn);
+      });
+    })
+    .catch((err) => console.error("Error al cargar data/categories.json:", err));
+
+  // 3. Obtener el índice de meses (data/months.json) y cargar las publicaciones
+  fetch("data/months.json")
+    .then((res) => res.json())
+    .then((months) => {
+      if (!months || months.length === 0) {
+        postsContainer.innerHTML = "<p>No hay publicaciones disponibles.</p>";
+        return;
+      }
+
+      // Cargar los JSON de cada mes disponible en paralelo
+      const fetchPromises = months.map((month) =>
+        fetch(`data/posts_${month}.json`)
+          .then((res) => (res.ok ? res.json() : []))
+          .catch(() => [])
+      );
+
+      return Promise.all(fetchPromises);
+    })
+    .then((postsByMonth) => {
+      if (!postsByMonth) return;
+
+      // Unificar todas las entradas en un único array
+      allPosts = postsByMonth.flat();
+
+      // Verificar si hay parámetro de página estática (?page=about)
+      const urlParams = new URLSearchParams(window.location.search);
+      const pageSlug = urlParams.get("page");
+
+      if (pageSlug) {
+        renderStaticPage(pageSlug);
+      } else {
+        renderPosts(allPosts);
+      }
+    })
+    .catch((err) => {
+      console.error("Error al cargar el feed de publicaciones:", err);
+      postsContainer.innerHTML = "<p>Error al cargar las publicaciones.</p>";
+    });
+
+  // Filtrar publicaciones por categoría sin recargar la página
+  function filterByCategory(categoryName, targetBtn) {
+    selectedCategory = categoryName;
+
+    // Actualizar estado 'active' en botones
+    document.querySelectorAll(".category-btn").forEach((btn) => {
+      btn.classList.remove("active");
+    });
+    targetBtn.classList.add("active");
+
+    if (!selectedCategory) {
+      renderPosts(allPosts);
     } else {
-        // Modo inicio / listado principal (ordenar por fecha descendente)
-        allPosts.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-        renderPostsList(allPosts);
-        trackPageView('home');
+      const filtered = allPosts.filter(
+        (post) =>
+          post.categoria &&
+          post.categoria.toLowerCase() === selectedCategory.toLowerCase()
+      );
+      renderPosts(filtered);
     }
-});
+  }
 
-// Cargar years.json y los posts por año correspondientes
-async function loadAllPosts() {
-    try {
-        // Forzar recarga sin caché local agregando timestamp
-        const cacheBuster = `?v=${Date.now()}`;
-        
-        const yearsResponse = await fetch(`data/years.json${cacheBuster}`);
-        if (!yearsResponse.ok) {
-            throw new Error(`HTTP ${yearsResponse.status} leyendo data/years.json`);
+  // Renderizar la lista de entradas en el DOM
+  function renderPosts(posts) {
+    postsContainer.innerHTML = "";
+
+    if (posts.length === 0) {
+      postsContainer.innerHTML =
+        "<p class='no-posts'>No se encontraron publicaciones en esta categoría.</p>";
+      return;
+    }
+
+    posts.forEach((post) => {
+      const article = document.createElement("article");
+      article.className = "post-card";
+
+      const tagsHTML =
+        post.tags && post.tags.length > 0
+          ? `<div class="post-tags">${post.tags
+              .map((tag) => `<span class="tag">#${tag}</span>`)
+              .join(" ")}</div>`
+          : "";
+
+      article.innerHTML = `
+        <header class="post-header">
+          <span class="post-id">[${post.id}]</span>
+          <span class="post-date">${post.fecha}</span>
+          <span class="post-category">${post.categoria}</span>
+        </header>
+        <h2><a href="${post.file}">${post.titulo}</a></h2>
+        <p class="post-extract">${post.extracto}</p>
+        ${tagsHTML}
+      `;
+
+      postsContainer.appendChild(article);
+    });
+  }
+
+  // Cargar y convertir una página Markdown estática (ej: pages/about.md)
+  function renderStaticPage(slug) {
+    fetch(`data/pages.json`)
+      .then((res) => res.json())
+      .then((pages) => {
+        const pageInfo = pages.find((p) => p.slug === slug);
+        if (!pageInfo) {
+          postsContainer.innerHTML = "<h2>404 - Página no encontrada</h2>";
+          return;
         }
 
-        const years = await yearsResponse.json();
-
-        // Cargar en paralelo todos los data/posts_YYYY.json
-        const fetchPromises = years.map(async (yr) => {
-            try {
-                const res = await fetch(`data/posts_${yr}.json${cacheBuster}`);
-                return res.ok ? await res.json() : [];
-            } catch (err) {
-                console.warn(`Error al leer data/posts_${yr}.json:`, err);
-                return [];
-            }
-        });
-
-        const results = await Promise.all(fetchPromises);
-        return results.flat();
-    } catch (error) {
-        console.error("❌ [error] No se pudo cargar el índice de publicaciones:", error);
-        return [];
-    }
-}
-
-// Registrar métrica de vistas en api/tracker.php
-function trackPageView(pageIdentifier) {
-    fetch(`api/tracker.php?page=${encodeURIComponent(pageIdentifier)}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                const totalEl = document.getElementById('total-views');
-                const pageEl = document.getElementById('page-views');
-
-                if (totalEl) totalEl.textContent = Number(data.total_views).toLocaleString();
-                if (pageEl) pageEl.textContent = Number(data.page_views).toLocaleString();
-            }
-        })
-        .catch(err => console.error("Error en tracker:", err));
-}
-
-// Renderizar lista en index.html
-function renderPostsList(posts) {
-    const container = document.getElementById('posts-container');
-    if (!container) {
-        console.error("❌ No se encontró el elemento <div id=\"posts-container\"> en index.html");
-        return;
-    }
-
-    if (!posts || posts.length === 0) {
-        container.innerHTML = '<p class="empty">No hay publicaciones disponibles.</p>';
-        return;
-    }
-
-    container.innerHTML = posts.map(post => {
-        // Fallbacks por si las propiedades del JSON varían entre español e inglés
-        const title = post.titulo || post.title || post.slug;
-        const excerpt = post.extracto || post.excerpt || '';
-        const date = post.fecha || post.date || '';
-        const category = post.categoria || post.category || 'General';
-        const postSlug = post.slug || post.id;
-
-        return `
-            <article class="post-card">
-                <h2>
-                    <a href="?post=${postSlug}">$ cat ${postSlug}.md</a>
-                </h2>
-                <div class="post-meta">
-                    <span>[${date}]</span> | <span>${category}</span>
-                </div>
-                <p>${excerpt}</p>
-            </article>
-        `;
-    }).join('');
-}
-
-// Renderizar contenido del post individual
-function renderPostContent(post) {
-    const container = document.getElementById('posts-container');
-    if (!container) return;
-
-    fetch(post.file)
-        .then(res => {
-            if (!res.ok) throw new Error("Archivo Markdown no encontrado");
-            return res.text();
-        })
-        .then(markdownText => {
-            const cleanMarkdown = markdownText.replace(/^---\s*\n[\s\S]*?\n---\s*\n/, '');
-            const htmlContent = typeof marked !== 'undefined' ? marked.parse(cleanMarkdown) : cleanMarkdown;
-
-            container.innerHTML = `
-                <article class="post-single">
-                    <h1>${post.titulo}</h1>
-                    <div class="post-meta">
-                        <time>${post.fecha}</time> | <span>${post.categoria}</span>
-                    </div>
-                    <div class="post-body">${htmlContent}</div>
-                    <a href="/" class="back-link">&larr; Volver al inicio</a>
-                </article>
-            `;
-        })
-        .catch(err => {
-            console.error(err);
-            renderNotFound();
-        });
-}
-
-function renderNotFound() {
-    const container = document.getElementById('posts-container');
-    if (container) {
-        container.innerHTML = `
-            <div class="not-found">
-                <h2>404 - Publicación no encontrada</h2>
-                <p>El artículo solicitado no existe o fue movido.</p>
-                <a href="/">&larr; Volver al inicio</a>
-            </div>
-        `;
-    }
-}
-
+        return fetch(pageInfo.file);
+      })
+      .then((res) => {
+        if (!res.ok) throw new Error("Página no encontrada");
+        return res.text();
+      })
+      .then((mdContent) => {
+        // Remover el Front Matter si existe antes de renderizar con marked
+        const cleanMd = mdContent.replace(/^---[\s\S]*?---\s*/, "");
+        postsContainer.innerHTML = `<div class="static-page">${marked.parse(cleanMd)}</div>`;
+      })
+      .catch((err) => {
+        postsContainer.innerHTML = `<h2>Error</h2><p>No se pudo cargar la página ${slug}.</p>`;
+      });
+  }
+});
