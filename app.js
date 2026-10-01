@@ -207,52 +207,51 @@ document.addEventListener("DOMContentLoaded", () => {
         postsContainer.innerHTML = `<h2>Error</h2><p>No se pudo cargar la página ${slug}.</p>`;
       });
   }
-
-    // Cargar contador de visitas estilo terminal bash
-    function loadVisitorCounter() {
-    let counterContainer = document.getElementById("visitor-counter");
-    if (!counterContainer) {
-        counterContainer = document.createElement("div");
-        counterContainer.id = "visitor-counter";
-        counterContainer.className = "bash-stats-box";
-        
-        // Lo insertamos al final del contenedor principal o el body
-        const mainContent = document.querySelector("main") || document.body;
-        mainContent.appendChild(counterContainer);
-    }
-
-    fetch("api/tracker.php")
-        .then((res) => res.json())
-        .then((data) => {
-        const totalVisits = data.total_visits || 0;
-        const todayVisits = data.today_visits || 0;
-
-        counterContainer.innerHTML = `
-            <pre class="ascii-box">
-    +--------------------------------------------------+
-    | <span class="prompt">user@migue-linux:~$</span> echo $SYS_METRICS            |
-    +--------------------------------------------------+
-    | TOTAL_VISITS : <span class="val">${String(totalVisits).padStart(8, " ")}</span>                  |
-    | TODAY_VISITS : <span class="val">${String(todayVisits).padStart(8, " ")}</span>                  |
-    | STATUS       : <span class="status">ONLINE [200 OK]</span>                   |
-    +--------------------------------------------------+
-    </pre>
-        `;
-        })
-        .catch(() => {
-        counterContainer.innerHTML = `
-            <pre class="ascii-box">
-    +--------------------------------------------------+
-    | <span class="prompt">user@migue-linux:~$</span> status                       |
-    +--------------------------------------------------+
-    | METRICS      : <span class="status-err">ERR_CONNECTION_FAILED</span>             |
-    +--------------------------------------------------+
-    </pre>
-        `;
-        });
-    }
-
-    // Ejecutar al cargar la página
-    loadVisitorCounter();
 });
 
+// Cargar contador de visitas estilo terminal bash
+function loadVisitorCounter() {
+  let counterContainer = document.getElementById("visitor-counter");
+  if (!counterContainer) {
+    counterContainer = document.createElement("div");
+    counterContainer.id = "visitor-counter";
+    counterContainer.className = "bash-stats-box";
+    
+    // Lo insertamos al final del contenedor principal o el body
+    const mainContent = document.querySelector("main") || document.body;
+    mainContent.appendChild(counterContainer);
+  }
+
+  fetch("api/tracker.php")
+    .then((res) => res.json())
+    .then((data) => {
+      const totalVisits = data.total_visits || 0;
+      const todayVisits = data.today_visits || 0;
+
+      counterContainer.innerHTML = `
+        <pre class="ascii-box">
++--------------------------------------------------+
+| <span class="prompt">user@migue-linux:~$</span> echo $SYS_METRICS            |
++--------------------------------------------------+
+| TOTAL_VISITS : <span class="val">${String(totalVisits).padStart(8, " ")}</span>                  |
+| TODAY_VISITS : <span class="val">${String(todayVisits).padStart(8, " ")}</span>                  |
+| STATUS       : <span class="status">ONLINE [200 OK]</span>                   |
++--------------------------------------------------+
+</pre>
+      `;
+    })
+    .catch(() => {
+      counterContainer.innerHTML = `
+        <pre class="ascii-box">
++--------------------------------------------------+
+| <span class="prompt">user@migue-linux:~$</span> status                       |
++--------------------------------------------------+
+| METRICS      : <span class="status-err">ERR_CONNECTION_FAILED</span>             |
++--------------------------------------------------+
+</pre>
+      `;
+    });
+}
+
+// Ejecutar al cargar la página
+loadVisitorCounter();
