@@ -1,0 +1,17 @@
+[
+  {
+    "slug": "about",
+    "titulo": "Sobre mí",
+    "file": "pages/about.md"
+  },
+  {
+    "slug": "contacto",
+    "titulo": "Contacto",
+    "file": "pages/contacto.md"
+  },
+  {
+    "slug": "blog",
+    "titulo": "Blog",
+    "file": "pages/blog.md"
+  }
+]

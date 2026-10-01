@@ -1,0 +1,27 @@
+[
+  {
+    "slug": "sysadmin",
+    "nombre": "SysAdmin",
+    "descripcion": "Linux, administración de sistemas, virtualización KVM y redes."
+  },
+  {
+    "slug": "cloud",
+    "nombre": "Cloud",
+    "descripcion": "Arquitectura Cloud-Native, contenedores, AWS, Kubernetes y Terraform."
+  },
+  {
+    "slug": "dev-web",
+    "nombre": "Dev & Web",
+    "descripcion": "Desarrollo web, JavaScript, PHP y arquitectura cliente-servidor."
+  },
+  {
+    "slug": "devops-automation",
+    "nombre": "DevOps & Automation",
+    "descripcion": "Shell scripting, bots, integración continua y despliegues."
+  },
+  {
+    "slug": "proyectos-bitacora",
+    "nombre": "Proyectos & Bitácora",
+    "descripcion": "Notas sobre proyectos personales, análisis y diseño de sistemas."
+  }
+]

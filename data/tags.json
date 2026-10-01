@@ -1,0 +1,62 @@
+[
+  {
+    "slug": "kvm",
+    "nombre": "KVM",
+    "descripcion": "Virtualización nativa basada en el kernel de Linux."
+  },
+  {
+    "slug": "fedora",
+    "nombre": "Fedora",
+    "descripcion": "Artículos y guías sobre la distribución Fedora Linux."
+  },
+  {
+    "slug": "virtualizacion",
+    "nombre": "Virtualización",
+    "descripcion": "Creación, gestión y optimización de máquinas virtuales."
+  },
+  {
+    "slug": "libvirt",
+    "nombre": "libvirt",
+    "descripcion": "API y demonio de gestión para hipervisores Linux."
+  },
+  {
+    "slug": "qemu",
+    "nombre": "QEMU",
+    "descripcion": "Emulador de procesador y acelerador de hardware."
+  },
+  {
+    "slug": "virt-manager",
+    "nombre": "virt-manager",
+    "descripcion": "Interfaz gráfica de usuario para la gestión de máquinas virtuales."
+  },
+  {
+    "slug": "virsh",
+    "nombre": "virsh",
+    "descripcion": "Herramienta de línea de comandos para la administración de libvirt."
+  },
+  {
+    "slug": "bash",
+    "nombre": "Bash",
+    "descripcion": "Scripts de consola y automatización de tareas en Shell."
+  },
+  {
+    "slug": "nginx",
+    "nombre": "Nginx",
+    "descripcion": "Servidor web, proxy inverso y optimización de tráfico."
+  },
+  {
+    "slug": "php",
+    "nombre": "PHP",
+    "descripcion": "Desarrollo backend y scripts de procesamiento."
+  },
+  {
+    "slug": "javascript",
+    "nombre": "JavaScript",
+    "descripcion": "Lógica del lado del cliente y manipulación del DOM."
+  },
+  {
+    "slug": "git",
+    "nombre": "Git",
+    "descripcion": "Control de versiones y flujos de despliegue."
+  }
+]

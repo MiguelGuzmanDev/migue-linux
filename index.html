@@ -14,17 +14,29 @@
     <div class="terminal-prompt">miguelguzman@Oaxaqueando:<span>~#</span> ./blog.sh --list</div>
     <h1>SysOps & Linux Infra Log</h1>
     <p>Bitácora técnica sobre Linux, automatización, SRE y redes.</p>
-    <nav>
+    
+    <!-- Navegación de Páginas Estáticas (cargadas dinámicamente desde data/pages.json) -->
+    <nav id="pages-nav">
       <a href="./">[ ~/posts ]</a>
-      <a href="?page=about">[ ~/about ]</a>
+      <!-- Se inyectan las páginas estáticas aquí -->
     </nav>
+
+    <!-- Filtros de Categorías (cargadas desde data/categories.json) -->
+    <div id="categories-bar" class="categories-container">
+      <!-- Se inyectan los botones de categoría aquí -->
+    </div>
+
+    <!-- Filtros de Tags (cargadas desde data/tags.json) -->
+    <div id="tags-bar" class="tags-container">
+      <!-- Se inyectan las etiquetas aquí -->
+    </div>
   </header>
 
   <main id="posts-container">
-    <!-- Contenido inyectado dinámicamente -->
+    <!-- Contenido inyectado dinámicamente mediante app.js -->
   </main>
 
-  <!-- Elementos HTML donde se mostrarán los contadores -->
+  <!-- Métricas y contadores -->
   <div class="view-counter">
     <span>👁️ Visitas a esta página: <strong id="page-views">--</strong></span>
     <span>🌐 Visitas totales: <strong id="total-views">--</strong></span>
@@ -32,11 +44,11 @@
 
   <script>
   document.addEventListener("DOMContentLoaded", () => {
-      // Extraer la ruta actual (ej: /posts/mi-post -> mi-post)
+      const urlParams = new URLSearchParams(window.location.search);
+      const pageParam = urlParams.get('page');
       const pathname = window.location.pathname.replace(/^\/|\/$/g, '');
-      const currentPage = pathname || 'home';
+      const currentPage = pageParam ? `page-${pageParam}` : (pathname || 'home');
 
-      // Llamar al endpoint PHP enviando el nombre de la página
       fetch(`/api/tracker.php?page=${encodeURIComponent(currentPage)}`)
           .then(response => response.json())
           .then(data => {
