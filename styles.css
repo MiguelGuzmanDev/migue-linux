@@ -273,3 +273,10 @@ a:-webkit-any-link {
   border-color: #64ffda;
   font-weight: bold;
 }
+
+.post-date {
+  display: block;          /* O display: inline-block para que respete los márgenes verticales */
+  margin-top: 0.5rem;      /* Margen superior */
+  margin-bottom: 0.5rem;   /* Margen inferior */
+  color: #8892b0;          /* Mantén el color de tu tema */
+}
