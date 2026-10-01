@@ -31,14 +31,21 @@
     <!-- Contenido inyectado dinámicamente mediante app.js -->
   </main>
 
-  <!-- Métricas y contadores -->
-  <div class="view-counter">
-    <span>👁️ Visitas a esta página: <strong id="page-views">--</strong></span>
-    <span>🌐 Visitas totales: <strong id="total-views">--</strong></span>
+  <!-- Métricas y contadores estilo Terminal Bash -->
+  <div id="visitor-counter" class="bash-stats-box">
+    <pre class="ascii-box">
++--------------------------------------------------+
+| <span class="prompt">miguelguzman@Oaxaqueando:~$</span> echo$SYS_METRICS    |
++--------------------------------------------------+
+| PAGE_VIEWS   : <span id="page-views" class="val">--</span>                          |
+| TOTAL_VISITS : <span id="total-views" class="val">--</span>                          |
+| STATUS       : <span id="sys-status" class="status">ONLINE [200 OK]</span>           |
++--------------------------------------------------+
+</pre>
   </div>
 
   <script>
-  document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => {
       const urlParams = new URLSearchParams(window.location.search);
       const pageParam = urlParams.get('page');
       const pathname = window.location.pathname.replace(/^\/|\/$/g, '');
@@ -51,11 +58,18 @@
                   const totalEl = document.getElementById('total-views');
                   const pageEl = document.getElementById('page-views');
 
-                  if (totalEl) totalEl.textContent = data.total_views.toLocaleString();
-                  if (pageEl) pageEl.textContent = data.page_views.toLocaleString();
+                  if (totalEl) totalEl.textContent = Number(data.total_views).toLocaleString().padStart(8, ' ');
+                  if (pageEl) pageEl.textContent = Number(data.page_views).toLocaleString().padStart(8, ' ');
               }
           })
-          .catch(err => console.error("Error al registrar visita:", err));
+          .catch(err => {
+              console.error("Error al registrar visita:", err);
+              const statusEl = document.getElementById('sys-status');
+              if (statusEl) {
+                  statusEl.className = 'status-err';
+                  statusEl.textContent = 'ERR_CONNECTION_FAILED';
+              }
+          });
   });
   </script>
 
