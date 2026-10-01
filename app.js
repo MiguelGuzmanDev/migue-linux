@@ -106,19 +106,21 @@ document.addEventListener("DOMContentLoaded", () => {
       const article = document.createElement("article");
       article.className = "post-card";
 
+      // Formatear tags si existen
       const tagsHTML = post.tags && post.tags.length > 0
         ? `<div class="post-tags">${post.tags.map((t) => `<span class="tag">#${t}</span>`).join(" ")}</div>`
         : "";
 
+      // Limpiar ruta del archivo para mostrar solo 'cat nombre-archivo.md'
+      const fileName = post.file.split("/").pop();
+
       article.innerHTML = `
-        <header class="post-header">
-          <span class="post-id">[${post.id}]</span>
-          <span class="post-date">${post.fecha}</span>
-          <span class="post-category">${post.categoria}</span>
-        </header>
-        <h2><a href="${post.file}">${post.titulo}</a></h2>
+        <h2><a href="${post.file}">cat ${fileName}</a></h2>
         <p class="post-extract">${post.extracto}</p>
-        ${tagsHTML}
+        <div class="post-meta">
+          <span class="post-date">${post.fecha}</span>
+          ${tagsHTML}
+        </div>
       `;
 
       postsContainer.appendChild(article);
