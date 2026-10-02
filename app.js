@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
     })
     .catch((err) => console.error("Error cargando categories.json:", err));
 
-  // 3. Cargar publicaciones (data/months.json)
+  // 3. Cargar publicaciones (data/months.json) y Router Principal
   fetch("data/months.json")
     .then((res) => res.json())
     .then((months) => {
@@ -76,10 +76,14 @@ document.addEventListener("DOMContentLoaded", () => {
       allPosts = postsByMonth.flat();
       currentFilteredPosts = allPosts;
 
+      // Evaluar la URL (Routing SPA)
       const urlParams = new URLSearchParams(window.location.search);
       const pageSlug = urlParams.get("page");
+      const postSlug = urlParams.get("post");
 
-      if (pageSlug) {
+      if (postSlug) {
+        renderSinglePost(postSlug);
+      } else if (pageSlug) {
         renderStaticPage(pageSlug);
       } else {
         renderPosts(currentFilteredPosts);
@@ -102,12 +106,11 @@ document.addEventListener("DOMContentLoaded", () => {
       );
     }
 
-    currentPage = 1; // Reiniciar a la primera página al filtrar
+    currentPage = 1;
     renderPosts(currentFilteredPosts);
   }
 
   function renderPosts(posts) {
-    // Mostrar header del blog, categorías y el footer de métricas
     const blogHeader = document.getElementById('blog-header');
     const cliFooter = document.querySelector('.cli-footer');
 
@@ -136,7 +139,6 @@ document.addEventListener("DOMContentLoaded", () => {
         : "";
 
       const fileName = post.file.split("/").pop();
-      // Usar post.slug o extraer el nombre sin extension .md para la URL de la SPA
       const postSlug = post.slug || fileName.replace(/\.md$/, "");
 
       article.innerHTML = `
@@ -160,7 +162,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (totalPages <= 1) return;
 
-    // Botón Anterior
     const prevBtn = document.createElement("button");
     prevBtn.className = "pagination-btn";
     prevBtn.textContent = "[ <-- Anterior ]";
@@ -173,12 +174,10 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // Estado de la página
     const pageIndicator = document.createElement("span");
     pageIndicator.className = "pagination-info";
     pageIndicator.textContent = `Página ${currentPage} de ${totalPages}`;
 
-    // Botón Siguiente
     const nextBtn = document.createElement("button");
     nextBtn.className = "pagination-btn";
     nextBtn.textContent = "[ Siguiente --> ]";
@@ -197,13 +196,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderStaticPage(slug) {
-    // 1. Ocultar el encabezado del blog y la barra de categorías
     const blogHeader = document.getElementById('blog-header');
     if (blogHeader) blogHeader.style.display = 'none';
     if (categoriesBar) categoriesBar.style.display = 'none';
     if (paginationContainer) paginationContainer.innerHTML = '';
 
-    // 2. Cargar el contenido estático
     fetch("data/pages.json")
       .then((res) => res.json())
       .then((pages) => {
@@ -213,10 +210,8 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .then((res) => res.text())
       .then((mdContent) => {
-        // Limpiar frontmatter del Markdown si existe
         const cleanMd = mdContent.replace(/^---[\s\S]*?---\s*/, "");
         
-        // Estructura tipo ventana / prompt de terminal Linux
         const terminalHeaderHTML = `
           <div class="terminal-page-wrapper">
             <div class="terminal-topbar">
@@ -247,40 +242,47 @@ document.addEventListener("DOMContentLoaded", () => {
               <span class="prompt-cmd">cat ~/${slug}.md</span>
             </div>
             <div class="status-err" style="padding: 1.5rem;">
-              [ERR_404] cat: test.md: No existe el fichero o el directorio: ~/${slug}.md
+              [ERR_404] cat: ${slug}.md: No existe el fichero o el directorio
             </div>
           </div>
         `;
       });
   }
+
   function renderSinglePost(slug) {
-    // Ocultar categorías y paginación
     if (categoriesBar) categoriesBar.style.display = 'none';
     if (paginationContainer) paginationContainer.innerHTML = '';
     const blogHeader = document.getElementById('blog-header');
     if (blogHeader) blogHeader.style.display = 'none';
 
-    // Determinar qué archivo JSON cargar según la fecha/año o cargar el índice activo
-    // Si tienes una función o variable global con todos los posts cargados, puedes usar esa.
-    // Aquí buscamos en el JSON del mes actual o el índice principal:
-    const postsJsonUrl = "data/posts_2026-10.json"; // o la variable/función que uses para obtener posts
+    // Buscar el post dentro del array de posts ya cargados (allPosts)
+    const postInfo = allPosts.find(
+      (p) => p.slug === slug || p.id === slug || (p.file && p.file.includes(slug))
+    );
 
-    fetch(postsJsonUrl)
-      .then((res) => res.json())
-      .then((posts) => {
-        // Buscar el post cuyo slug o ID coincida
-        const postInfo = posts.find(
-          (p) => p.slug === slug || p.id === slug || p.file.includes(slug)
-        );
-        
-        if (!postInfo) throw new Error("Post no encontrado en el índice");
+    if (!postInfo) {
+      postsContainer.innerHTML = `
+        <div class="terminal-page-wrapper">
+          <div class="terminal-command-line">
+            <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> 
+            <span class="prompt-cmd">cat posts/${slug}.md</span>
+          </div>
+          <div class="status-err" style="padding: 1.5rem; color: #ff7b72;">
+            [ERR_404] No post found for slug: ${slug}
+          </div>
+        </div>
+      `;
+      return;
+    }
 
-        // Usamos postInfo.file que contiene la ruta exacta: "posts/optimizacion-kernel105A.md"
-        return Promise.all([fetch(postInfo.file).then(r => r.text()), postInfo]);
+    // Cargar el archivo .md indicado por postInfo.file
+    fetch(postInfo.file)
+      .then((res) => {
+        if (!res.ok) throw new Error("File not found");
+        return res.text();
       })
-      .then(([mdContent, postInfo]) => {
+      .then((mdContent) => {
         const cleanMd = mdContent.replace(/^---[\s\S]*?---\s*/, "");
-        const fileName = postInfo.file.split("/").pop();
 
         const terminalHTML = `
           <div class="terminal-page-wrapper">
@@ -309,10 +311,10 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="terminal-page-wrapper">
             <div class="terminal-command-line">
               <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> 
-              <span class="prompt-cmd">cat posts/${slug}.md</span>
+              <span class="prompt-cmd">cat ${postInfo.file}</span>
             </div>
             <div class="status-err" style="padding: 1.5rem; color: #ff7b72;">
-              [ERR_404] No such post: ${slug}
+              [ERR_404] No such file: ${postInfo.file}
             </div>
           </div>
         `;
