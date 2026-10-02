@@ -1,5 +1,15 @@
 [
   {
+    "slug": "home",
+    "titulo": "Home",
+    "file": "pages/home.md"
+  },
+  {
+    "slug": "blog",
+    "titulo": "Blog",
+    "file": "pages/blog.md"
+  },
+  {
     "slug": "about",
     "titulo": "About / CV",
     "file": "pages/about.md"
@@ -8,10 +18,5 @@
     "slug": "contacto",
     "titulo": "Contacto",
     "file": "pages/contacto.md"
-  },
-  {
-    "slug": "blog",
-    "titulo": "Blog",
-    "file": "pages/blog.md"
   }
 ]
