@@ -107,6 +107,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderPosts(posts) {
+    // Mostrar header del blog, categorías y el footer de métricas
+    const blogHeader = document.getElementById('blog-header');
+    const cliFooter = document.querySelector('.cli-footer');
+
+    if (blogHeader) blogHeader.style.display = 'block';
+    if (categoriesBar) categoriesBar.style.display = 'flex';
+    if (cliFooter) cliFooter.style.display = 'block';
+
     postsContainer.innerHTML = "";
 
     if (posts.length === 0) {
@@ -115,7 +123,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Paginación: cortar el array de publicaciones según la página actual
     const startIndex = (currentPage - 1) * postsPerPage;
     const endIndex = startIndex + postsPerPage;
     const postsToShow = posts.slice(startIndex, endIndex);
@@ -124,16 +131,16 @@ document.addEventListener("DOMContentLoaded", () => {
       const article = document.createElement("article");
       article.className = "post-card";
 
-      // Formatear tags si existen
       const tagsHTML = post.tags && post.tags.length > 0
         ? `<div class="post-tags">${post.tags.map((t) => `<span class="tag">#${t}</span>`).join(" ")}</div>`
         : "";
 
-      // Limpiar ruta del archivo para mostrar solo 'cat nombre-archivo.md'
       const fileName = post.file.split("/").pop();
+      // Usar post.slug o extraer el nombre sin extension .md para la URL de la SPA
+      const postSlug = post.slug || fileName.replace(/\.md$/, "");
 
       article.innerHTML = `
-        <h2><a href="${post.file}">cat ${fileName}</a></h2>
+        <h2><a href="?post=${postSlug}">cat ${fileName}</a></h2>
         <p class="post-extract">${post.extracto}</p>
         <div class="post-meta">
           ${tagsHTML}
@@ -190,7 +197,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderStaticPage(slug) {
-    paginationContainer.innerHTML = ""; // Ocultar controles de paginación en páginas estáticas
+    // 1. Ocultar el encabezado del blog y la barra de categorías
+    const blogHeader = document.getElementById('blog-header');
+    if (blogHeader) blogHeader.style.display = 'none';
+    if (categoriesBar) categoriesBar.style.display = 'none';
+    if (paginationContainer) paginationContainer.innerHTML = '';
+
+    // 2. Cargar el contenido estático
     fetch("data/pages.json")
       .then((res) => res.json())
       .then((pages) => {
@@ -200,11 +213,44 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .then((res) => res.text())
       .then((mdContent) => {
+        // Limpiar frontmatter del Markdown si existe
         const cleanMd = mdContent.replace(/^---[\s\S]*?---\s*/, "");
-        postsContainer.innerHTML = `<div class="static-page">${marked.parse(cleanMd)}</div>`;
+        
+        // Estructura tipo ventana / prompt de terminal Linux
+        const terminalHeaderHTML = `
+          <div class="terminal-page-wrapper">
+            <div class="terminal-topbar">
+              <div class="terminal-dots">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+              </div>
+              <span class="terminal-filename">bash — miguelguzman@Oaxaqueando: ~/${slug}.md</span>
+            </div>
+            <div class="terminal-command-line">
+              <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> 
+              <span class="prompt-cmd">cat ~/${slug}.md</span>
+            </div>
+            <div class="static-page-content">
+              ${marked.parse(cleanMd)}
+            </div>
+          </div>
+        `;
+
+        postsContainer.innerHTML = terminalHeaderHTML;
       })
       .catch((err) => {
-        postsContainer.innerHTML = `<h2>Error</h2><p>No se pudo cargar la página ${slug}.</p>`;
+        postsContainer.innerHTML = `
+          <div class="terminal-page-wrapper">
+            <div class="terminal-command-line">
+              <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> 
+              <span class="prompt-cmd">cat ~/${slug}.md</span>
+            </div>
+            <div class="status-err" style="padding: 1.5rem;">
+              [ERR_404] cat: test.md: No existe el fichero o el directorio: ~/${slug}.md
+            </div>
+          </div>
+        `;
       });
   }
 });
