@@ -612,3 +612,9 @@ a:-webkit-any-link {
   border: 1px solid #30363d;
   font-weight: bold;
 }
+
+#pages-nav {
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px dashed #21262d;
+}
