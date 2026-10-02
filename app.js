@@ -107,10 +107,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderPosts(posts) {
-    // Asegurar que el header del blog y las categorías estén visibles si estamos en el blog
+    // Mostrar header del blog, categorías y el footer de métricas
     const blogHeader = document.getElementById('blog-header');
+    const cliFooter = document.querySelector('.cli-footer');
+
     if (blogHeader) blogHeader.style.display = 'block';
     if (categoriesBar) categoriesBar.style.display = 'flex';
+    if (cliFooter) cliFooter.style.display = 'block';
 
     postsContainer.innerHTML = "";
 
@@ -120,7 +123,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Paginación: cortar el array de publicaciones según la página actual
     const startIndex = (currentPage - 1) * postsPerPage;
     const endIndex = startIndex + postsPerPage;
     const postsToShow = posts.slice(startIndex, endIndex);
@@ -129,12 +131,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const article = document.createElement("article");
       article.className = "post-card";
 
-      // Formatear tags si existen
       const tagsHTML = post.tags && post.tags.length > 0
         ? `<div class="post-tags">${post.tags.map((t) => `<span class="tag">#${t}</span>`).join(" ")}</div>`
         : "";
 
-      // Limpiar ruta del archivo para mostrar solo 'cat nombre-archivo.md'
       const fileName = post.file.split("/").pop();
 
       article.innerHTML = `
@@ -195,13 +195,15 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderStaticPage(slug) {
-    // 1. Ocultar el encabezado del blog y la barra de categorías
+    // Ocultar header del blog, barra de categorías y el footer de métricas
     const blogHeader = document.getElementById('blog-header');
+    const cliFooter = document.querySelector('.cli-footer');
+
     if (blogHeader) blogHeader.style.display = 'none';
     if (categoriesBar) categoriesBar.style.display = 'none';
+    if (cliFooter) cliFooter.style.display = 'none';
     if (paginationContainer) paginationContainer.innerHTML = '';
 
-    // 2. Cargar el contenido estático
     fetch("data/pages.json")
       .then((res) => res.json())
       .then((pages) => {
@@ -211,10 +213,8 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .then((res) => res.text())
       .then((mdContent) => {
-        // Limpiar frontmatter del Markdown si existe
         const cleanMd = mdContent.replace(/^---[\s\S]*?---\s*/, "");
         
-        // Estructura tipo ventana / prompt de terminal Linux
         const terminalHeaderHTML = `
           <div class="terminal-page-wrapper">
             <div class="terminal-topbar">
@@ -223,10 +223,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 <span class="dot yellow"></span>
                 <span class="dot green"></span>
               </div>
-              <span class="terminal-filename">bash — miguelguzman@migue-linux: ~/${slug}.md</span>
+              <span class="terminal-filename">bash — 80x24</span>
             </div>
             <div class="terminal-command-line">
-              <span class="prompt-user">miguelguzman@migue-linux</span>:<span class="prompt-path">~#</span> 
+              <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> 
               <span class="prompt-cmd">cat ~/${slug}.md</span>
             </div>
             <div class="static-page-content">
@@ -241,7 +241,7 @@ document.addEventListener("DOMContentLoaded", () => {
         postsContainer.innerHTML = `
           <div class="terminal-page-wrapper">
             <div class="terminal-command-line">
-              <span class="prompt-user">miguelguzman@migue-linux</span>:<span class="prompt-path">~#</span> 
+              <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> 
               <span class="prompt-cmd">cat ~/${slug}.md</span>
             </div>
             <div class="status-err" style="padding: 1.5rem;">
