@@ -107,6 +107,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderPosts(posts) {
+    // Asegurar que el header del blog y las categorías estén visibles si estamos en el blog
+    const blogHeader = document.getElementById('blog-header');
+    if (blogHeader) blogHeader.style.display = 'block';
+    if (categoriesBar) categoriesBar.style.display = 'flex';
+
     postsContainer.innerHTML = "";
 
     if (posts.length === 0) {
@@ -190,13 +195,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderStaticPage(slug) {
-    // 1. Ocultar o vaciar el encabezado/filtros del blog si existen
-    const blogHeader = document.querySelector('.blog-header'); // O el ID/clase de tu header de blog
-    const categoryFilter = document.querySelector('.categories-filter'); // O la clase de tus categorías
-    const paginationContainer = document.getElementById('pagination');
-
+    // 1. Ocultar el encabezado del blog y la barra de categorías
+    const blogHeader = document.getElementById('blog-header');
     if (blogHeader) blogHeader.style.display = 'none';
-    if (categoryFilter) categoryFilter.style.display = 'none';
+    if (categoriesBar) categoriesBar.style.display = 'none';
     if (paginationContainer) paginationContainer.innerHTML = '';
 
     // 2. Cargar el contenido estático

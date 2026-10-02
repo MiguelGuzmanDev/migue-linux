@@ -11,17 +11,20 @@
 <body>
 
   <header>
-    <div class="terminal-prompt">miguelguzman@Oaxaqueando:<span>~#</span> ./blog.sh --list</div>
-    <h1>SysOps & Linux Infra Log</h1>
-    <p>Bitácora técnica sobre Linux, automatización, SRE y redes.</p>
+    <!-- Encabezado exclusivo del Blog -->
+    <div id="blog-header">
+      <div class="terminal-prompt">miguelguzman@Oaxaqueando:<span>~#</span> ./blog.sh --list</div>
+      <h1>SysOps & Linux Infra Log</h1>
+      <p>Bitácora técnica sobre Linux, automatización, SRE y redes.</p>
+    </div>
     
-    <!-- Navegación de Páginas Estáticas (cargadas dinámicamente desde data/pages.json) -->
+    <!-- Navegación de Páginas Estáticas -->
     <nav id="pages-nav">
       <a href="./">[ ~/posts ]</a>
       <!-- Se inyectan las páginas estáticas aquí -->
     </nav>
 
-    <!-- Filtros de Categorías (cargadas desde data/categories.json) -->
+    <!-- Filtros de Categorías -->
     <div id="categories-bar" class="categories-container">
       <!-- Se inyectan los botones de categoría aquí -->
     </div>
