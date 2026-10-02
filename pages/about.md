@@ -1,5 +1,3 @@
-# miguelguzman@migue-linux:~$ cat ~/about.md
-
 ![Miguel Ángel Guzmán Pérez - Profile Photo](../assets/img/pages/miguel-guzman.jpeg)
 
 ```bash
