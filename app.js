@@ -190,7 +190,16 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderStaticPage(slug) {
-    paginationContainer.innerHTML = ""; // Ocultar controles de paginación en páginas estáticas
+    // 1. Ocultar o vaciar el encabezado/filtros del blog si existen
+    const blogHeader = document.querySelector('.blog-header'); // O el ID/clase de tu header de blog
+    const categoryFilter = document.querySelector('.categories-filter'); // O la clase de tus categorías
+    const paginationContainer = document.getElementById('pagination');
+
+    if (blogHeader) blogHeader.style.display = 'none';
+    if (categoryFilter) categoryFilter.style.display = 'none';
+    if (paginationContainer) paginationContainer.innerHTML = '';
+
+    // 2. Cargar el contenido estático
     fetch("data/pages.json")
       .then((res) => res.json())
       .then((pages) => {
@@ -204,7 +213,7 @@ document.addEventListener("DOMContentLoaded", () => {
         postsContainer.innerHTML = `<div class="static-page">${marked.parse(cleanMd)}</div>`;
       })
       .catch((err) => {
-        postsContainer.innerHTML = `<h2>Error</h2><p>No se pudo cargar la página ${slug}.</p>`;
+        postsContainer.innerHTML = `<h2>Error 404</h2><p>No se pudo cargar la página ${slug}.</p>`;
       });
   }
 });
