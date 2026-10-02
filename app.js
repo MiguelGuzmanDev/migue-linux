@@ -253,4 +253,81 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
       });
   }
+  // 1. Función para cargar y renderizar un Post individual dentro de la terminal
+  function renderSinglePost(slug) {
+    // Ocultar categorías y paginación, pero mantener el footer de métricas visible
+    if (categoriesBar) categoriesBar.style.display = 'none';
+    if (paginationContainer) paginationContainer.innerHTML = '';
+    const blogHeader = document.getElementById('blog-header');
+    if (blogHeader) blogHeader.style.display = 'none';
+
+    fetch("data/posts.json")
+      .then((res) => res.json())
+      .then((posts) => {
+        // Buscar el post por slug o coincidencia de archivo
+        const postInfo = posts.find(
+          (p) => p.slug === slug || p.file.endsWith(`${slug}.md`)
+        );
+        if (!postInfo) throw new Error("Post no encontrado");
+        return fetch(postInfo.file);
+      })
+      .then((res) => res.text())
+      .then((mdContent) => {
+        const cleanMd = mdContent.replace(/^---[\s\S]*?---\s*/, "");
+
+        const terminalHTML = `
+          <div class="terminal-page-wrapper">
+            <div class="terminal-topbar">
+              <div class="terminal-dots">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+              </div>
+              <span class="terminal-filename">bash — 80x24</span>
+            </div>
+            <div class="terminal-command-line">
+              <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> 
+              <span class="prompt-cmd">cat posts/${slug}.md</span>
+            </div>
+            <div class="static-page-content">
+              ${marked.parse(cleanMd)}
+            </div>
+          </div>
+        `;
+
+        postsContainer.innerHTML = terminalHTML;
+      })
+      .catch((err) => {
+        postsContainer.innerHTML = `
+          <div class="terminal-page-wrapper">
+            <div class="terminal-command-line">
+              <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> 
+              <span class="prompt-cmd">cat posts/${slug}.md</span>
+            </div>
+            <div class="status-err" style="padding: 1.5rem;">
+              [ERR_404] No such post: posts/${slug}.md
+            </div>
+          </div>
+        `;
+      });
+  }
+
+  // 2. Router principal al iniciar la aplicación
+  const urlParams = new URLSearchParams(window.location.search);
+  const postSlug = urlParams.get("post");
+  const pageSlug = urlParams.get("page");
+
+  if (postSlug) {
+    renderSinglePost(postSlug);
+  } else if (pageSlug) {
+    renderStaticPage(pageSlug);
+  } else {
+    // Si no hay parámetros en la URL, se cargan las publicaciones del blog
+    fetch("data/posts.json")
+      .then((res) => res.json())
+      .then((data) => {
+        currentFilteredPosts = data;
+        renderPosts(currentFilteredPosts);
+      });
+  }
 });
