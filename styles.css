@@ -576,3 +576,39 @@ a:-webkit-any-link {
   color: #d29922;
   font-weight: bold;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Estado activo para la navegación de páginas */
+#pages-nav a {
+  color: #8b949e;
+  text-decoration: none;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+#pages-nav a:hover {
+  color: #58a6ff;
+}
+
+/* Enlace/Página Activa */
+#pages-nav a.active {
+  color: #58a6ff;
+  background-color: rgba(88, 166, 255, 0.1);
+  border: 1px solid #30363d;
+  font-weight: bold;
+}

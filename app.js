@@ -88,6 +88,8 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         renderPosts(currentFilteredPosts);
       }
+
+      updateActiveNav();
     })
     .catch((err) => {
       console.error("Error al cargar las publicaciones:", err);
@@ -319,5 +321,31 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         `;
       });
+  }
+  // Resaltar la página o sección activa en #pages-nav
+  function updateActiveNav() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentPage = urlParams.get("page");
+    const currentPost = urlParams.get("post");
+
+    const navLinks = pagesNav.querySelectorAll("a");
+
+    navLinks.forEach((link) => {
+      link.classList.remove("active");
+
+      const href = link.getAttribute("href");
+
+      if (currentPost || (!currentPage && !currentPost)) {
+        // Si estamos viendo un post o la portada del blog (sin ?page=), resalta [ ~/posts ] o [ ~/blog ]
+        if (href === "./" || href.includes("page=blog")) {
+          link.classList.add("active");
+        }
+      } else if (currentPage) {
+        // Si hay un parámetro ?page=, resalta el enlace que coincida
+        if (href.includes(`page=${currentPage}`)) {
+          link.classList.add("active");
+        }
+      }
+    });
   }
 });
