@@ -431,3 +431,109 @@ a:-webkit-any-link {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
 }
+
+
+/* ==========================================================================
+   TERMINAL SHELL HEADER FOR STATIC PAGES
+   ========================================================================== */
+
+.terminal-page-wrapper {
+  background-color: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  margin-top: 1rem;
+}
+
+/* Barra superior de la ventana */
+.terminal-topbar {
+  background-color: #161b22;
+  border-bottom: 1px solid #30363d;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.terminal-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.terminal-dots .dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.terminal-dots .red { background-color: #ff5f56; }
+.terminal-dots .yellow { background-color: #ffbd2e; }
+.terminal-dots .green { background-color: #27c93f; }
+
+.terminal-filename {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.82rem;
+  color: #8b949e;
+}
+
+/* Línea de comando con prompt Bash */
+.terminal-command-line {
+  background-color: #090d12;
+  padding: 12px 18px;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.95rem;
+  border-bottom: 1px dashed #21262d;
+}
+
+.prompt-user {
+  color: #58a6ff;
+  font-weight: bold;
+}
+
+.prompt-path {
+  color: #79c0ff;
+  font-weight: bold;
+}
+
+.prompt-cmd {
+  color: #2ea043;
+  font-weight: bold;
+  margin-left: 6px;
+}
+
+/* Contenido del Markdown dentro de la ventana de terminal */
+.static-page-content {
+  padding: 2rem;
+  color: #c9d1d9;
+}
+
+.static-page-content img {
+  max-width: 150px;
+  height: auto;
+  display: block;
+  margin: 1.5rem auto;
+  border-radius: 8px;
+  border: 2px solid #30363d;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.static-page-content h1, 
+.static-page-content h2, 
+.static-page-content h3 {
+  color: #58a6ff;
+  border-bottom: 1px solid #21262d;
+  padding-bottom: 0.3rem;
+  margin-top: 1.8rem;
+}
+
+.static-page-content code {
+  background-color: #161b22;
+  color: #79c0ff;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+}
