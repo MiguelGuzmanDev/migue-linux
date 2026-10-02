@@ -253,27 +253,34 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
       });
   }
-  // 1. Función para cargar y renderizar un Post individual dentro de la terminal
   function renderSinglePost(slug) {
-    // Ocultar categorías y paginación, pero mantener el footer de métricas visible
+    // Ocultar categorías y paginación
     if (categoriesBar) categoriesBar.style.display = 'none';
     if (paginationContainer) paginationContainer.innerHTML = '';
     const blogHeader = document.getElementById('blog-header');
     if (blogHeader) blogHeader.style.display = 'none';
 
-    fetch("data/posts.json")
+    // Determinar qué archivo JSON cargar según la fecha/año o cargar el índice activo
+    // Si tienes una función o variable global con todos los posts cargados, puedes usar esa.
+    // Aquí buscamos en el JSON del mes actual o el índice principal:
+    const postsJsonUrl = "data/posts_2026-10.json"; // o la variable/función que uses para obtener posts
+
+    fetch(postsJsonUrl)
       .then((res) => res.json())
       .then((posts) => {
-        // Buscar el post por slug o coincidencia de archivo
+        // Buscar el post cuyo slug o ID coincida
         const postInfo = posts.find(
-          (p) => p.slug === slug || p.file.endsWith(`${slug}.md`)
+          (p) => p.slug === slug || p.id === slug || p.file.includes(slug)
         );
-        if (!postInfo) throw new Error("Post no encontrado");
-        return fetch(postInfo.file);
+        
+        if (!postInfo) throw new Error("Post no encontrado en el índice");
+
+        // Usamos postInfo.file que contiene la ruta exacta: "posts/optimizacion-kernel105A.md"
+        return Promise.all([fetch(postInfo.file).then(r => r.text()), postInfo]);
       })
-      .then((res) => res.text())
-      .then((mdContent) => {
+      .then(([mdContent, postInfo]) => {
         const cleanMd = mdContent.replace(/^---[\s\S]*?---\s*/, "");
+        const fileName = postInfo.file.split("/").pop();
 
         const terminalHTML = `
           <div class="terminal-page-wrapper">
@@ -287,7 +294,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
             <div class="terminal-command-line">
               <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> 
-              <span class="prompt-cmd">cat posts/${slug}.md</span>
+              <span class="prompt-cmd">cat ${postInfo.file}</span>
             </div>
             <div class="static-page-content">
               ${marked.parse(cleanMd)}
@@ -304,30 +311,11 @@ document.addEventListener("DOMContentLoaded", () => {
               <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> 
               <span class="prompt-cmd">cat posts/${slug}.md</span>
             </div>
-            <div class="status-err" style="padding: 1.5rem;">
-              [ERR_404] No such post: posts/${slug}.md
+            <div class="status-err" style="padding: 1.5rem; color: #ff7b72;">
+              [ERR_404] No such post: ${slug}
             </div>
           </div>
         `;
-      });
-  }
-
-  // 2. Router principal al iniciar la aplicación
-  const urlParams = new URLSearchParams(window.location.search);
-  const postSlug = urlParams.get("post");
-  const pageSlug = urlParams.get("page");
-
-  if (postSlug) {
-    renderSinglePost(postSlug);
-  } else if (pageSlug) {
-    renderStaticPage(pageSlug);
-  } else {
-    // Si no hay parámetros en la URL, se cargan las publicaciones del blog
-    fetch("data/posts.json")
-      .then((res) => res.json())
-      .then((data) => {
-        currentFilteredPosts = data;
-        renderPosts(currentFilteredPosts);
       });
   }
 });
