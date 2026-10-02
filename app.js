@@ -195,15 +195,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderStaticPage(slug) {
-    // Ocultar header del blog, barra de categorías y el footer de métricas
+    // 1. Ocultar el encabezado del blog y la barra de categorías
     const blogHeader = document.getElementById('blog-header');
-    const cliFooter = document.querySelector('.cli-footer');
-
     if (blogHeader) blogHeader.style.display = 'none';
     if (categoriesBar) categoriesBar.style.display = 'none';
-    if (cliFooter) cliFooter.style.display = 'none';
     if (paginationContainer) paginationContainer.innerHTML = '';
 
+    // 2. Cargar el contenido estático
     fetch("data/pages.json")
       .then((res) => res.json())
       .then((pages) => {
@@ -213,8 +211,10 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .then((res) => res.text())
       .then((mdContent) => {
+        // Limpiar frontmatter del Markdown si existe
         const cleanMd = mdContent.replace(/^---[\s\S]*?---\s*/, "");
         
+        // Estructura tipo ventana / prompt de terminal Linux
         const terminalHeaderHTML = `
           <div class="terminal-page-wrapper">
             <div class="terminal-topbar">
@@ -223,7 +223,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <span class="dot yellow"></span>
                 <span class="dot green"></span>
               </div>
-              <span class="terminal-filename">bash — 80x24</span>
+              <span class="terminal-filename">bash — miguelguzman@Oaxaqueando: ~/${slug}.md</span>
             </div>
             <div class="terminal-command-line">
               <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> 
