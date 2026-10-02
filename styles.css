@@ -537,3 +537,41 @@ a:-webkit-any-link {
   padding: 0.2rem 0.4rem;
   border-radius: 4px;
 }
+
+
+/* Branding Global del Sitio (MigueLinux.com) */
+#site-global-branding {
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px dashed #21262d;
+}
+
+#site-global-branding .global-title {
+  margin: 0.2rem 0;
+  font-size: 1.8rem;
+}
+
+#site-global-branding .global-title a {
+  color: #58a6ff;
+  text-decoration: none;
+}
+
+#site-global-branding .global-title a:hover {
+  color: #79c0ff;
+}
+
+#site-global-branding .global-title .tld {
+  color: #2ea043;
+}
+
+#site-global-branding .global-tagline {
+  margin: 0;
+  color: #8b949e;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.9rem;
+}
+
+#site-global-branding .comment-symbol {
+  color: #d29922;
+  font-weight: bold;
+}
