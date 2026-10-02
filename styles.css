@@ -479,7 +479,6 @@ a:-webkit-any-link {
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
   font-size: 0.82rem;
   color: #8b949e;
-  white-space: nowrap;
 }
 
 /* Línea de comando con prompt Bash */
@@ -489,7 +488,6 @@ a:-webkit-any-link {
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
   font-size: 0.95rem;
   border-bottom: 1px dashed #21262d;
-  word-break: break-word;
 }
 
 .prompt-user {
@@ -515,7 +513,7 @@ a:-webkit-any-link {
 }
 
 .static-page-content img {
-  max-width: 140px;
+  max-width: 150px;
   height: auto;
   display: block;
   margin: 1.5rem auto;
@@ -538,20 +536,4 @@ a:-webkit-any-link {
   color: #79c0ff;
   padding: 0.2rem 0.4rem;
   border-radius: 4px;
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
-}
-
-/* Ocultar el footer redundante en páginas estáticas */
-body:has(.terminal-page-wrapper) .cli-footer {
-  display: none !important;
-}
-
-/* Ajustes Responsive para teléfonos */
-@media (max-width: 600px) {
-  .terminal-filename {
-    display: none; /* Oculta el título central en móviles pequeños para evitar encimados */
-  }
-  .static-page-content {
-    padding: 1rem;
-  }
 }
