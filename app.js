@@ -211,11 +211,44 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .then((res) => res.text())
       .then((mdContent) => {
+        // Limpiar frontmatter del Markdown si existe
         const cleanMd = mdContent.replace(/^---[\s\S]*?---\s*/, "");
-        postsContainer.innerHTML = `<div class="static-page">${marked.parse(cleanMd)}</div>`;
+        
+        // Estructura tipo ventana / prompt de terminal Linux
+        const terminalHeaderHTML = `
+          <div class="terminal-page-wrapper">
+            <div class="terminal-topbar">
+              <div class="terminal-dots">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+              </div>
+              <span class="terminal-filename">bash — miguelguzman@migue-linux: ~/${slug}.md</span>
+            </div>
+            <div class="terminal-command-line">
+              <span class="prompt-user">miguelguzman@migue-linux</span>:<span class="prompt-path">~#</span> 
+              <span class="prompt-cmd">cat ~/${slug}.md</span>
+            </div>
+            <div class="static-page-content">
+              ${marked.parse(cleanMd)}
+            </div>
+          </div>
+        `;
+
+        postsContainer.innerHTML = terminalHeaderHTML;
       })
       .catch((err) => {
-        postsContainer.innerHTML = `<h2>Error 404</h2><p>No se pudo cargar la página ${slug}.</p>`;
+        postsContainer.innerHTML = `
+          <div class="terminal-page-wrapper">
+            <div class="terminal-command-line">
+              <span class="prompt-user">miguelguzman@migue-linux</span>:<span class="prompt-path">~#</span> 
+              <span class="prompt-cmd">cat ~/${slug}.md</span>
+            </div>
+            <div class="status-err" style="padding: 1.5rem;">
+              [ERR_404] No such file or directory: ~/${slug}.md
+            </div>
+          </div>
+        `;
       });
   }
 });
