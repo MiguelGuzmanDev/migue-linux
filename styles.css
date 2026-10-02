@@ -513,7 +513,8 @@ a:-webkit-any-link {
 }
 
 .static-page-content img {
-  max-width: 150px;
+  /*max-width: 150px;*/
+  max-width: 100%;
   height: auto;
   display: block;
   margin: 1.5rem auto;
