@@ -321,6 +321,21 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         `;
       });
+
+    // Dentro de renderSinglePost() en app.js:
+    const authorHTML = `
+      <div class="author-card">
+        <!-- El bloque HTML de arriba -->
+      </div>
+    `;
+
+    // Insertar el contenido del post + la tarjeta de autor
+    postsContainer.innerHTML = `
+      <article class="single-post">
+        ${postContent}
+        ${authorHTML}
+      </article>
+    `;
   }
   // Resaltar la página o sección activa en #pages-nav
   function updateActiveNav() {
@@ -349,3 +364,5 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+
