@@ -118,16 +118,15 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="author-card">
         <div class="author-card-header">
           <div class="author-avatar">
-            <img src="${authorAvatar}" alt="${author.nombre}">
+            <img src="${authorAvatar}" alt="${author.name}">
           </div>
           
           <div class="author-info">
             <span class="author-label">${authorTitle}</span>
-            <h4 class="author-name">${author.nombre}</h4>
+            <h4 class="author-name">${author.name}</h4>
           </div>
 
           <div class="author-google-link">
-            <a class="google-preferred-source" href="https://www.google.com/preferences/source?q=migue-linux.com" target="_blank" rel="noopener">
               <svg class="google-icon" viewBox="0 0 48 48" aria-hidden="true">
                 <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
                 <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
@@ -140,11 +139,11 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
 
         <div class="author-bio">
-          <p>${author.descripcion}</p>
+          <p>${author.description}</p>
         </div>
 
         <div class="author-footer">
-          <a href="${author.link || `?author=${author.id}`}" class="more-from-author">Más sobre ${author.nombre} &rarr;</a>
+          <a href="${author.link || `?author=${author.id}`}" class="more-from-author">Más sobre ${author.name} &rarr;</a>
         </div>
       </div>
     `;
@@ -199,7 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const authorId = post.author || "miguel-guzman";
       const authorInfo = allAuthors.find((a) => a.id === authorId);
-      const authorName = authorInfo ? authorInfo.nombre : "Miguel Guzmán";
+      const authorName = authorInfo ? authorInfo.name : "Miguel Guzmán";
       const authorLink = authorInfo ? authorInfo.link : `?author=${authorId}`;
 
       article.innerHTML = `
