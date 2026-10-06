@@ -112,7 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!author) return '';
 
     const authorTitle = author.title || author.Title || 'El autor';
-    const authorAvatar = author.avatar || 'https://migue-linux.com/assets/img/avatar.png';
+    const authorAvatar = author.avatar || 'https://migue-linux.com/assets/img/pages/miguel-guzman.jpeg';
 
     return `
       <div class="author-card">
