@@ -6,6 +6,7 @@ fecha: 2026-09-28
 categoria: sysadmin
 tags: ["linux", "kernel", "sysctl"]
 extracto: Optimizando somaxconn y TCP reuse para evitar cuellos de botella.
+author: miguel-guzman
 ---
 
 # Optimización del Kernel Linux

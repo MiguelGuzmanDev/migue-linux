@@ -14,6 +14,16 @@ document.addEventListener("DOMContentLoaded", () => {
   paginationContainer.className = "pagination-bar";
   postsContainer.after(paginationContainer);
 
+  let allAuthors = [];
+
+  // Cargar autores
+  fetch("data/authors.json")
+    .then((res) => res.json())
+    .then((authors) => {
+      allAuthors = authors;
+    })
+    .catch((err) => console.error("Error cargando authors.json:", err));
+
   // 1. Cargar Páginas Estáticas (data/pages.json)
   fetch("data/pages.json")
     .then((res) => res.json())
@@ -143,12 +153,16 @@ document.addEventListener("DOMContentLoaded", () => {
       const fileName = post.file.split("/").pop();
       const postSlug = post.slug || fileName.replace(/\.md$/, "");
 
+      const authorId = post.author || "miguel-guzman";
+      const authorInfo = allAuthors.find((a) => a.id === authorId);
+      const authorName = authorInfo ? authorInfo.nombre : "Miguel Guzmán";
+
       article.innerHTML = `
         <h2><a href="?post=${postSlug}">cat ${fileName}</a></h2>
         <p class="post-extract">${post.extracto}</p>
         <div class="post-meta">
           ${tagsHTML}
-          <span class="post-date">${post.fecha}</span>
+          <span class="post-date">${post.fecha} de ${authorName}</span>
         </div>
       `;
 
