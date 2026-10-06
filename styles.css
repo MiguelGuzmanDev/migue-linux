@@ -722,6 +722,7 @@ a:-webkit-any-link {
 .author-footer {
   display: flex;
   justify-content: flex-end;
+  margin-top: 3rem;
 }
 
 .more-from-author {
