@@ -627,7 +627,132 @@ a:-webkit-any-link {
 
 
 
+/* ==========================================================================
+   Author Card Styles (Single Post View)
+   ========================================================================== */
 
+.author-card {
+  margin-top: 3rem;
+  padding: 1.5rem;
+  background-color: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  color: #c9d1d9;
+  font-family: inherit;
+}
+
+.author-card-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #21262d;
+}
+
+.author-avatar img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #30363d;
+}
+
+.author-info {
+  flex: 1;
+  min-width: 150px;
+}
+
+.author-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #8b949e;
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.author-name {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #f0f6fc;
+}
+
+/* Enlace a Google Fuente Preferida */
+.author-google-link {
+  margin-left: auto;
+}
+
+.google-preferred-source {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  background-color: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #8b949e;
+  font-size: 0.8rem;
+  text-decoration: none;
+  transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+}
+
+.google-preferred-source:hover {
+  border-color: #58a6ff;
+  color: #58a6ff;
+  background-color: #161b22;
+}
+
+.google-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* Biografía y Pie de Tarjeta */
+.author-bio p {
+  margin: 0 0 1rem 0;
+  line-height: 1.6;
+  font-size: 0.95rem;
+  color: #8b949e;
+}
+
+.author-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.more-from-author {
+  color: #58a6ff;
+  font-size: 0.875rem;
+  text-decoration: none;
+  font-weight: 500;
+  transition: text-decoration 0.2s ease;
+}
+
+.more-from-author:hover {
+  text-decoration: underline;
+}
+
+/* Responsivo para pantallas pequeñas */
+@media (max-width: 600px) {
+  .author-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .author-google-link {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .google-preferred-source {
+    width: 100%;
+    justify-content: center;
+  }
+}
 /* Estilo base del enlace de autor en las tarjetas */
 .author-link {
   color: inherit;
