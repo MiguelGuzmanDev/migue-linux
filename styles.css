@@ -628,3 +628,15 @@ a:-webkit-any-link {
 
 
 
+/* Estilo base del enlace de autor en las tarjetas */
+.author-link {
+  color: inherit;
+  text-decoration: none;
+  transition: text-decoration 0.2s ease, color 0.2s ease;
+}
+
+/* Efecto hover: se subraya al pasar el cursor */
+.author-link:hover {
+  text-decoration: underline;
+  color: #58a6ff; /* O el color acentuado de tu tema terminal */
+}
