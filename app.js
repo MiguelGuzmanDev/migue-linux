@@ -156,13 +156,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const authorId = post.author || "miguel-guzman";
       const authorInfo = allAuthors.find((a) => a.id === authorId);
       const authorName = authorInfo ? authorInfo.nombre : "Miguel Guzmán";
+      const authorLink = authorInfo ? authorInfo.link : `?author=${authorId}`;
 
       article.innerHTML = `
         <h2><a href="?post=${postSlug}">cat ${fileName}</a></h2>
         <p class="post-extract">${post.extracto}</p>
         <div class="post-meta">
           ${tagsHTML}
-          <span class="post-date">${post.fecha} de ${authorName}</span>
+          <span class="post-date">${post.fecha} de <a href="${authorLink}" class="author-link">${authorName}</a></span>
         </div>
       `;
 
