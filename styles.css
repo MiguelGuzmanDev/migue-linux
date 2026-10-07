@@ -771,7 +771,8 @@ a:-webkit-any-link {
 
 /* Tarjeta de autor estilo terminal finger */
 .author-terminal-card {
-  margin-top: 1rem;
+  /*margin-top: 1rem;*/
+  margin: 1rem;
   padding: 1.25rem;
   background-color: #0d1117;
   border: 1px solid #30363d;
