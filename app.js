@@ -91,7 +91,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const pageSlug = urlParams.get("page");
       const postSlug = urlParams.get("post");
       const authorSlug = urlParams.get("author");
-      const authorprofile = urlParams.get("profile");
 
       if (postSlug) {
         renderSinglePost(postSlug);
@@ -146,18 +145,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const title = authorInfo.title || 'SysAdmin & Contribuidor';
     const avatar = authorInfo.avatar || 'https://migue-linux.com/assets/img/authors/default.avif';
     const description = authorInfo.description || 'Sin biografía disponible.';
+    const profileFile = authorInfo.profile || `${authorSlug}.md`;
 
     // 2. Intentar cargar el archivo Markdown extendido del autor
     let authorMarkdownHTML = "";
     try {
-      const mdResponse = await fetch(`data/authors/${authorprofile}`);
+      const mdResponse = await fetch(`data/authors/${profileFile}`);
       if (mdResponse.ok) {
         const mdText = await mdResponse.text();
         // Usar 'marked.parse' o la librería de Markdown que tengas en el proyecto
         authorMarkdownHTML = typeof marked !== 'undefined' ? marked.parse(mdText) : `<pre>${mdText}</pre>`;
       }
     } catch (err) {
-      console.warn(`No se pudo cargar el archivo extendido data/authors/${authorprofile}`, err);
+      console.warn(`No se pudo cargar el archivo extendido data/authors/${profileFile}`, err);
     }
 
     // 2. Filtrar publicaciones escritas por el autor y tomar solo las últimas 5
