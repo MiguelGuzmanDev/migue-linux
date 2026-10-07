@@ -845,6 +845,7 @@ a:-webkit-any-link {
 .author-extended-bio {
   color: #c9d1d9;
   line-height: 1.6;
+  padding: 1.25rem;
 }
 
 .author-extended-bio h2,
