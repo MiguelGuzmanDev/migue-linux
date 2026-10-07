@@ -159,20 +159,20 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="author-card" style="margin-top: 1rem; border: none; background: transparent; padding: 0;">
           <div class="author-card-header">
             <div class="author-avatar">
-              <img src="${authorAvatar}" alt="${authorInfo.nombre}">
+              <img src="${authorAvatar}" alt="${authorInfo.name}">
             </div>
             <div class="author-info">
               <span class="author-label">${authorTitle}</span>
-              <h3 class="author-name" style="font-size: 1.4rem;">${authorInfo.nombre}</h3>
+              <h3 class="author-name" style="font-size: 1.4rem;">${authorInfo.name}</h3>
             </div>
           </div>
           <div class="author-bio">
-            <p>${authorInfo.descripcion}</p>
+            <p>${authorInfo.description}</p>
           </div>
         </div>
       </div>
       <h3 style="margin-bottom: 1rem; color: #8b949e; font-weight: normal; border-bottom: 1px solid #30363d; padding-bottom: 0.5rem;">
-        > Publicaciones escritas por ${authorInfo.nombre}:
+        > Publicaciones escritas por ${authorInfo.name}:
       </h3>
     `;
 
