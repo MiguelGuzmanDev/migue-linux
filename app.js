@@ -153,10 +153,13 @@ document.addEventListener("DOMContentLoaded", () => {
     let authorMarkdownHTML = "";
     try {
       const mdResponse = await fetch(`data/authors/${profileFile}`);
+      console.log("Status HTTP del fetch:", mdResponse.status); // Debería ser 200
       if (mdResponse.ok) {
         const mdText = await mdResponse.text();
+        console.log("Contenido del Markdown recibido:", mdText);
         // Usar 'marked.parse' o la librería de Markdown que tengas en el proyecto
         authorMarkdownHTML = typeof marked !== 'undefined' ? marked.parse(mdText) : `<pre>${mdText}</pre>`;
+        console.log("HTML generado por marked:", authorMarkdownHTML);
       }
     } catch (err) {
       console.warn(`No se pudo cargar el archivo extendido data/authors/${profileFile}`, err);
