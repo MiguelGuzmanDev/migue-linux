@@ -139,10 +139,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Fallbacks de datos
-    const name = authorInfo.name || authorInfo.nombre || 'Autor';
-    const title = authorInfo.title || authorInfo.Title || 'SysAdmin & Contribuidor';
-    const avatar = authorInfo.avatar || 'https://migue-linux.com/assets/img/pages/miguel-guzman.jpeg';
-    const description = authorInfo.description || authorInfo.descripcion || 'Sin biografía disponible.';
+    const name = authorInfo.name || 'Autor';
+    const title = authorInfo.title || 'SysAdmin & Contribuidor';
+    //const avatar = authorInfo.avatar || 'https://migue-linux.com/assets/img/pages/miguel-guzman.jpeg';
+    const avatar = authorInfo.avatar || 'https://migue-linux.com/assets/img/authors/default.avif';
+    const description = authorInfo.description || 'Sin biografía disponible.';
 
     // 2. Filtrar publicaciones escritas por el autor y tomar solo las últimas 5
     const allAuthorPosts = allPosts.filter(
