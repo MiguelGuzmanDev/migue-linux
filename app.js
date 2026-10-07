@@ -147,6 +147,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const description = authorInfo.description || 'Sin biografía disponible.';
     const profileFile = authorInfo.profile || `${authorSlug}.md`;
 
+    console.log(profileFile)
+
     // 2. Intentar cargar el archivo Markdown extendido del autor
     let authorMarkdownHTML = "";
     try {
