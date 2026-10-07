@@ -5,7 +5,8 @@
     "name": "Miguel Angel Guzmán Pérez",
     "description": "SysAdmin y apasionado del software libre. Me enfoco en la optimización de servidores Linux, infraestructura en la nube y la aplicación de buenas prácticas. Especializado en troubleshooting y resolución de problemas complejos en producción, desarrollo web y automatización. Comparto bitácoras técnicas, guías de diagnóstico y soluciones prácticas para administradores de sistemas.",
     "link": "https://migue-linux.com/?author=miguel-guzman",
-    "avatar": "https://migue-linux.com/assets/img/authors/miguel-guzman.jpg" 
+    "avatar": "https://migue-linux.com/assets/img/authors/miguel-guzman.jpg",
+    "profile": "miguel-guzman.md"
   },
   {
     "id":"miguel-guzman2",
@@ -13,6 +14,7 @@
     "name": "Miguel Guzmán",
     "description": "Gusti Ayu Sandra is a Brand Reputation Specialist at Hostinger, where she keeps conversations between the brand and its community honest and helpful. Her career started in Customer Success, which taught her what customers really care about. Today, she works closely with the community across different platforms to make sure every voice is heard. Follow her on LinkedIn.",
     "link": "https://migue-linux.com/?author=miguel-guzman",
-    "avatar": "https://migue-linux.com/assets/img/authors/miguel-guzman.jpg" 
+    "avatar": "https://migue-linux.com/assets/img/authors/miguel-guzman.jpg",
+    "profile": "miguel-guzman.md"
   }
 ]

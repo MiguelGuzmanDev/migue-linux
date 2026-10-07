@@ -840,3 +840,36 @@ a:-webkit-any-link {
   font-size: 0.85rem;
   color: #484f58;
 }
+
+/* Estilos para la biografía extendida de Markdown del autor */
+.author-extended-bio {
+  color: #c9d1d9;
+  line-height: 1.6;
+}
+
+.author-extended-bio h2,
+.author-extended-bio h3 {
+  color: #58a6ff;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid #21262d;
+  padding-bottom: 0.3rem;
+}
+
+.author-extended-bio ul {
+  padding-left: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.author-extended-bio li {
+  margin-bottom: 0.3rem;
+  color: #8b949e;
+}
+
+.author-extended-bio blockquote {
+  border-left: 3px solid #58a6ff;
+  padding-left: 1rem;
+  margin: 1rem 0;
+  color: #8b949e;
+  font-style: italic;
+}
