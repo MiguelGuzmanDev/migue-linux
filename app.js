@@ -147,19 +147,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const description = authorInfo.description || 'Sin biografía disponible.';
     const profileFile = authorInfo.profile || `${authorSlug}.md`;
 
-    console.log(profileFile)
 
     // 2. Intentar cargar el archivo Markdown extendido del autor
     let authorMarkdownHTML = "";
     try {
       const mdResponse = await fetch(`data/authors/${profileFile}`);
-      console.log("Status HTTP del fetch:", mdResponse.status); // Debería ser 200
       if (mdResponse.ok) {
         const mdText = await mdResponse.text();
-        console.log("Contenido del Markdown recibido:", mdText);
         // Usar 'marked.parse' o la librería de Markdown que tengas en el proyecto
         authorMarkdownHTML = typeof marked !== 'undefined' ? marked.parse(mdText) : `<pre>${mdText}</pre>`;
-        console.log("HTML generado por marked:", authorMarkdownHTML);
       }
     } catch (err) {
       console.warn(`No se pudo cargar el archivo extendido data/authors/${profileFile}`, err);
@@ -205,6 +201,14 @@ document.addEventListener("DOMContentLoaded", () => {
             <p class="author-bio-text">${description}</p>
           </div>
         </div>
+
+        ${
+          authorMarkdownHTML 
+            ? `<div class="author-extended-bio" style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px dashed #30363d;">
+                ${authorMarkdownHTML}
+               </div>` 
+            : ''
+        }
       </div>
 
       <h3 class="author-posts-title">
