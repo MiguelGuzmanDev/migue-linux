@@ -112,7 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
       postsContainer.innerHTML = "<p>Error al cargar las publicaciones.</p>";
     });
 
-  function renderAuthorPage(authorSlug) {
+  async function renderAuthorPage(authorSlug) {
     const blogHeader = document.getElementById('blog-header');
     const cliFooter = document.querySelector('.cli-footer');
 
