@@ -141,7 +141,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Fallbacks de datos
     const name = authorInfo.name || 'Autor';
     const title = authorInfo.title || 'SysAdmin & Contribuidor';
-    //const avatar = authorInfo.avatar || 'https://migue-linux.com/assets/img/pages/miguel-guzman.jpeg';
     const avatar = authorInfo.avatar || 'https://migue-linux.com/assets/img/authors/default.avif';
     const description = authorInfo.description || 'Sin biografía disponible.';
 
@@ -230,7 +229,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!author) return '';
 
     const authorTitle = author.title || author.Title || 'El autor';
-    const authorAvatar = author.avatar || 'https://migue-linux.com/assets/img/pages/miguel-guzman.jpeg';
+    const authorAvatar = author.avatar || 'https://migue-linux.com/assets/img/authors/default.avif';
 
     return `
       <div class="author-card">
