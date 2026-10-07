@@ -766,3 +766,76 @@ a:-webkit-any-link {
   text-decoration: underline;
   color: #58a6ff; /* O el color acentuado de tu tema terminal */
 }
+
+
+/* Tarjeta de autor estilo terminal finger */
+.author-terminal-card {
+  margin-top: 1rem;
+  padding: 1.25rem;
+  background-color: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  font-family: monospace;
+}
+
+.author-card-main {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px dashed #21262d;
+}
+
+.author-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.author-field {
+  font-size: 0.9rem;
+}
+
+.field-label {
+  color: #8b949e;
+  display: inline-block;
+  min-width: 70px;
+}
+
+.field-value {
+  color: #c9d1d9;
+}
+
+.field-value.highlight {
+  color: #58a6ff;
+}
+
+.field-value.font-bold {
+  font-weight: bold;
+  color: #f0f6fc;
+}
+
+.author-bio-section {
+  margin-top: 1rem;
+}
+
+.author-bio-text {
+  margin: 0.5rem 0 0 0;
+  color: #8b949e;
+  line-height: 1.5;
+  font-size: 0.88rem;
+}
+
+.author-posts-title {
+  margin-bottom: 1rem;
+  color: #8b949e;
+  font-weight: normal;
+  border-bottom: 1px solid #30363d;
+  padding-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.posts-count {
+  font-size: 0.85rem;
+  color: #484f58;
+}

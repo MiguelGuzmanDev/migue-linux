@@ -128,20 +128,29 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="terminal-page-wrapper">
           <div class="terminal-command-line">
             <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> 
-            <span class="prompt-cmd">cat authors/${authorSlug}.json</span>
+            <span class="prompt-cmd">finger ${authorSlug}</span>
           </div>
           <div class="status-err" style="padding: 1.5rem; color: #ff7b72;">
-            [ERR_404] Autor no encontrado: ${authorSlug}
+            [ERR_404] User/Author not found: ${authorSlug}
           </div>
         </div>
       `;
       return;
     }
 
-    // 2. Renderizar el perfil del autor en formato Terminal
-    const authorTitle = authorInfo.title || authorInfo.Title || 'El autor';
-    const authorAvatar = authorInfo.avatar || 'https://migue-linux.com/assets/img/pages/miguel-guzman.jpeg';
+    // Fallbacks de datos
+    const name = authorInfo.name || authorInfo.nombre || 'Autor';
+    const title = authorInfo.title || authorInfo.Title || 'SysAdmin & Contribuidor';
+    const avatar = authorInfo.avatar || 'https://migue-linux.com/assets/img/pages/miguel-guzman.jpeg';
+    const description = authorInfo.description || authorInfo.descripcion || 'Sin biografía disponible.';
 
+    // 2. Filtrar publicaciones escritas por el autor y tomar solo las últimas 5
+    const allAuthorPosts = allPosts.filter(
+      (post) => (post.author || "miguel-guzman") === authorSlug
+    );
+    const recentPosts = allAuthorPosts.slice(0, 5);
+
+    // 3. Header estilo comando 'finger' de UNIX
     const authorProfileHTML = `
       <div class="terminal-page-wrapper" style="margin-bottom: 2rem;">
         <div class="terminal-topbar">
@@ -150,46 +159,47 @@ document.addEventListener("DOMContentLoaded", () => {
             <span class="dot yellow"></span>
             <span class="dot green"></span>
           </div>
-          <span class="terminal-filename">bash — finger ${authorInfo.id}</span>
+          <span class="terminal-filename">bash — finger ${authorSlug}</span>
         </div>
         <div class="terminal-command-line">
           <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> 
-          <span class="prompt-cmd">finger ${authorInfo.id}</span>
+          <span class="prompt-cmd">finger ${authorSlug}</span>
         </div>
-        <div class="author-card" style="margin-top: 1rem; border: none; background: transparent; padding: 0;">
-          <div class="author-card-header">
+        
+        <div class="author-terminal-card">
+          <div class="author-card-main">
             <div class="author-avatar">
-              <img src="${authorAvatar}" alt="${authorInfo.name}">
+              <img src="${avatar}" alt="${name}">
             </div>
-            <div class="author-info">
-              <span class="author-label">${authorTitle}</span>
-              <h3 class="author-name" style="font-size: 1.4rem;">${authorInfo.name}</h3>
+            <div class="author-details">
+              <div class="author-field"><span class="field-label">Login:</span> <span class="field-value">${authorSlug}</span></div>
+              <div class="author-field"><span class="field-label">Name:</span> <span class="field-value font-bold">${name}</span></div>
+              <div class="author-field"><span class="field-label">Role:</span> <span class="field-value highlight">${title}</span></div>
+              <div class="author-field"><span class="field-label">Host:</span> <span class="field-value">migue-linux.com</span></div>
             </div>
           </div>
-          <div class="author-bio">
-            <p>${authorInfo.description}</p>
+          
+          <div class="author-bio-section">
+            <span class="field-label">> Bio / System Plan:</span>
+            <p class="author-bio-text">${description}</p>
           </div>
         </div>
       </div>
-      <h3 style="margin-bottom: 1rem; color: #8b949e; font-weight: normal; border-bottom: 1px solid #30363d; padding-bottom: 0.5rem;">
-        > Publicaciones escritas por ${authorInfo.name}:
+
+      <h3 class="author-posts-title">
+        > Últimas ${recentPosts.length} publicaciones de ${name} ${allAuthorPosts.length > 5 ? `<span class="posts-count">(${allAuthorPosts.length} en total)</span>` : ''}:
       </h3>
     `;
 
-    // 3. Filtrar publicaciones escritas por el autor
-    const authorPosts = allPosts.filter(
-      (post) => (post.author || "miguel-guzman") === authorSlug
-    );
-
     postsContainer.innerHTML = authorProfileHTML;
 
-    if (authorPosts.length === 0) {
+    if (recentPosts.length === 0) {
       postsContainer.innerHTML += "<p class='no-posts'>No hay publicaciones registradas para este autor.</p>";
       return;
     }
 
-    // 4. Renderizar las tarjetas de los posts filtrados
-    authorPosts.forEach((post) => {
+    // 4. Renderizar solo las últimas 5 tarjetas
+    recentPosts.forEach((post) => {
       const article = document.createElement("article");
       article.className = "post-card";
 
