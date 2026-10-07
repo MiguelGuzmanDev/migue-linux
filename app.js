@@ -98,7 +98,9 @@ document.addEventListener("DOMContentLoaded", () => {
       } else if (pageSlug) {
         renderStaticPage(pageSlug);
       } else if (authorSlug) {
-        await renderAuthorPage(authorSlug);
+        renderAuthorPage(authorSlug).catch((err) => {
+          console.error("Error al renderizar el perfil de autor:", err);
+        });
       } else {
         renderPosts(currentFilteredPosts);
       }
