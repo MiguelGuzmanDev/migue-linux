@@ -90,11 +90,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const urlParams = new URLSearchParams(window.location.search);
       const pageSlug = urlParams.get("page");
       const postSlug = urlParams.get("post");
+      const authorSlug = urlParams.get("author");
 
       if (postSlug) {
         renderSinglePost(postSlug);
       } else if (pageSlug) {
         renderStaticPage(pageSlug);
+      } else if (authorSlug) {
+        renderAuthorPage(authorSlug);
       } else {
         renderPosts(currentFilteredPosts);
       }
@@ -105,6 +108,110 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Error al cargar las publicaciones:", err);
       postsContainer.innerHTML = "<p>Error al cargar las publicaciones.</p>";
     });
+
+  function renderAuthorPage(authorSlug) {
+    const blogHeader = document.getElementById('blog-header');
+    const cliFooter = document.querySelector('.cli-footer');
+
+    if (blogHeader) blogHeader.style.display = 'none';
+    if (categoriesBar) categoriesBar.style.display = 'none';
+    if (cliFooter) cliFooter.style.display = 'block';
+
+    postsContainer.innerHTML = "";
+    paginationContainer.innerHTML = "";
+
+    // 1. Buscar los datos del autor
+    const authorInfo = allAuthors.find((a) => a.id === authorSlug);
+
+    if (!authorInfo) {
+      postsContainer.innerHTML = `
+        <div class="terminal-page-wrapper">
+          <div class="terminal-command-line">
+            <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> 
+            <span class="prompt-cmd">cat authors/${authorSlug}.json</span>
+          </div>
+          <div class="status-err" style="padding: 1.5rem; color: #ff7b72;">
+            [ERR_404] Autor no encontrado: ${authorSlug}
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    // 2. Renderizar el perfil del autor en formato Terminal
+    const authorTitle = authorInfo.title || authorInfo.Title || 'El autor';
+    const authorAvatar = authorInfo.avatar || 'https://migue-linux.com/assets/img/pages/miguel-guzman.jpeg';
+
+    const authorProfileHTML = `
+      <div class="terminal-page-wrapper" style="margin-bottom: 2rem;">
+        <div class="terminal-topbar">
+          <div class="terminal-dots">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+          </div>
+          <span class="terminal-filename">bash — finger ${authorInfo.id}</span>
+        </div>
+        <div class="terminal-command-line">
+          <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> 
+          <span class="prompt-cmd">finger ${authorInfo.id}</span>
+        </div>
+        <div class="author-card" style="margin-top: 1rem; border: none; background: transparent; padding: 0;">
+          <div class="author-card-header">
+            <div class="author-avatar">
+              <img src="${authorAvatar}" alt="${authorInfo.nombre}">
+            </div>
+            <div class="author-info">
+              <span class="author-label">${authorTitle}</span>
+              <h3 class="author-name" style="font-size: 1.4rem;">${authorInfo.nombre}</h3>
+            </div>
+          </div>
+          <div class="author-bio">
+            <p>${authorInfo.descripcion}</p>
+          </div>
+        </div>
+      </div>
+      <h3 style="margin-bottom: 1rem; color: #8b949e; font-weight: normal; border-bottom: 1px solid #30363d; padding-bottom: 0.5rem;">
+        > Publicaciones escritas por ${authorInfo.nombre}:
+      </h3>
+    `;
+
+    // 3. Filtrar publicaciones escritas por el autor
+    const authorPosts = allPosts.filter(
+      (post) => (post.author || "miguel-guzman") === authorSlug
+    );
+
+    postsContainer.innerHTML = authorProfileHTML;
+
+    if (authorPosts.length === 0) {
+      postsContainer.innerHTML += "<p class='no-posts'>No hay publicaciones registradas para este autor.</p>";
+      return;
+    }
+
+    // 4. Renderizar las tarjetas de los posts filtrados
+    authorPosts.forEach((post) => {
+      const article = document.createElement("article");
+      article.className = "post-card";
+
+      const tagsHTML = post.tags && post.tags.length > 0
+        ? `<div class="post-tags">${post.tags.map((t) => `<span class="tag">#${t}</span>`).join(" ")}</div>`
+        : "";
+
+      const fileName = post.file.split("/").pop();
+      const postSlug = post.slug || fileName.replace(/\.md$/, "");
+
+      article.innerHTML = `
+        <h2><a href="?post=${postSlug}">cat ${fileName}</a></h2>
+        <p class="post-extract">${post.extracto}</p>
+        <div class="post-meta">
+          ${tagsHTML}
+          <span class="post-date">${post.fecha}</span>
+        </div>
+      `;
+
+      postsContainer.appendChild(article);
+    });
+  }
 
   function getAuthorCardHTML(authorId) {
     const author = allAuthors.find((a) => a.id === authorId) || allAuthors.find((a) => a.id === 'miguel-guzman');
@@ -386,6 +493,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const urlParams = new URLSearchParams(window.location.search);
     const currentPage = urlParams.get("page");
     const currentPost = urlParams.get("post");
+    const currentAuthor = urlParams.get("author");
 
     const navLinks = pagesNav.querySelectorAll("a");
 
@@ -394,13 +502,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const href = link.getAttribute("href");
 
-      if (currentPost || (!currentPage && !currentPost)) {
-        // Si estamos viendo un post o la portada del blog (sin ?page=), resalta [ ~/posts ] o [ ~/blog ]
+      // Si estamos en un post, en la página de un autor, o en el feed principal (sin ?page=)
+      if (currentPost || currentAuthor || (!currentPage && !currentPost && !currentAuthor)) {
         if (href === "./" || href.includes("page=blog")) {
           link.classList.add("active");
         }
       } else if (currentPage) {
-        // Si hay un parámetro ?page=, resalta el enlace que coincida
+        // Si estamos viendo una página estática como ?page=about
         if (href.includes(`page=${currentPage}`)) {
           link.classList.add("active");
         }
