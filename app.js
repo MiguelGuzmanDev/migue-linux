@@ -216,8 +216,8 @@ document.addEventListener("DOMContentLoaded", () => {
       </h3>
 
       <div class="terminal-prompt">miguelguzman@Oaxaqueando:<span>~#</span> tail -n 5 posts.json</div>
-              <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> 
-              <span class="prompt-cmd">cat ~/home.md</span>
+      <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> 
+      <span class="prompt-cmd">tail -n 5 ~/posts.json</span>
     `;
 
     postsContainer.innerHTML = authorProfileHTML;
