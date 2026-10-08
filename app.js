@@ -211,12 +211,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         <div class="author-extended-bio" style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #30363d;">
-          <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> 
-          <span class="prompt-cmd">tail -n 5 ~/posts.json</span>
-
           <h3 class="author-posts-title" style="margin-bottom: 1rem;">
             > Últimas ${recentPosts.length} publicaciones de ${name} ${allAuthorPosts.length > 5 ? `<span class="posts-count">(${allAuthorPosts.length} en total)</span>` : ''}:
           </h3>
+
+          <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> 
+          <span class="prompt-cmd">tail -n 5 ~/posts.json</span>
 
           <div id="author-posts-list"></div>
         </div>
