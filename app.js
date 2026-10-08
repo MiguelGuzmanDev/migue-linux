@@ -214,6 +214,8 @@ document.addEventListener("DOMContentLoaded", () => {
       <h3 class="author-posts-title">
         > Últimas ${recentPosts.length} publicaciones de ${name} ${allAuthorPosts.length > 5 ? `<span class="posts-count">(${allAuthorPosts.length} en total)</span>` : ''}:
       </h3>
+
+      <div class="terminal-prompt">miguelguzman@Oaxaqueando:<span>~#</span> tail -n 5 posts.json</div>
     `;
 
     postsContainer.innerHTML = authorProfileHTML;
