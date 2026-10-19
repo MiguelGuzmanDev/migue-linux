@@ -591,6 +591,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="terminal-command-line">
           <span class="prompt-user">miguelguzman@migue-linux</span>:<span class="prompt-path">~#</span> 
           <span class="prompt-cmd">cat ${invalidResource}.md</span>
+          <br>
           <span class="prompt-cmd">cat: ${invalidResource}.md: No existe el fichero o el directorio</span>
         </div>
         
