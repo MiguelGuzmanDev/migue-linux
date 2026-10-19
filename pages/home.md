@@ -1,31 +1,66 @@
 # 🚀 WELCOME TO MIGUELINUX.COM
 
-```bash
-HOSTNAME : Oaxaqueando / migue-linux.com
-OPERATOR : Miguel Ángel Guzmán Pérez (SysOps / SRE / Linux Infra)
-TAGLINE  : "Todos tenemos algo que compartir"
+```text
+====================================================================
+miguelguzman@migue-linux:~$ uname -a
+Linux migue-linux 6.1.0 #1 SMP PREEMPT_DYNAMIC x86_64 GNU/Linux
+
+HOSTNAME : migue-linux.com
+OPERATOR : Miguel Ángel Guzmán Pérez (SysOps / Infrastructure / Linux)
 STATUS   : Systems Online & Operating Normally [200 OK]
+TAGLINE  : "Todos tenemos algo que compartir"
+====================================================================
 ```
 
-📌 ABOUT_THIS_NODE
-Bienvenido a mi bitácora técnica y espacio personal sobre Linux, automatización, infraestructura cloud y cultura DevOps. Este sitio está diseñado como una terminal liviana para documentar aprendizajes, incidentes en producción, scripts y guías sobre administración de sistemas.
+## 📌 Sobre este nodo
 
-⚡ QUICK_NAVIGATION
-[ ~/posts ] — Explora todos los artículos técnicos y bitácoras ordenadas por categoría.
+¡Bienvenido a mi bitácora técnica! migue-linux.com es un espacio personal y terminal ligera dedicada a la administración de sistemas, DevOps, infraestructura web, automatización entre otras cosas.
 
-[ ~/about ] — Conoce mi perfil profesional, experiencia laboral y stack de tecnologías.
+Aquí documento aprendizajes diarios, resolución de incidentes en producción, scripts de monitoreo y guías prácticas sobre el ecosistema Linux y la cultura Open Source.
 
-[ ~/contacto ] — Vías directas para colaborar, enviar sugerencias o charlar de infraestructura.
+> "In Coffee and Code We Trust."
 
-🛠️ CURRENT_STACK_&_TOOLING
-OS / Distros: Debian, Ubuntu Server, AlmaLinux, Arch.
+## ⚡ Navegacion rapida
 
-Web & Proxy: Nginx, PHP-FPM, Apache, SSL/TLS, CPanel.
+Para explorar la plataforma, puedes utilizar los comandos del menú superior o navegar directamente por estas secciones:
 
-Automation & Scripting: Bash, Git, git-ftp, Cron Jobs, Systemd.
+* **`~/posts`** — Colección de artículos técnicos, guías y bitácoras ordenadas por fecha.
+* **`~/author`** — Conoce más sobre mi trayectoria profesional, proyectos y *dotfiles*.
+* **`~/contacto`** — Canales directos para colaborar, consultar dudas o hablar de infraestructura.
 
-Databases & Monitoring: MongoDB, MySQL, Custom Shell Monitors & Alerts.
+## 🛠️ Stack tecnico y herramientas
 
-```bash
-miguelguzman@Oaxaqueando:~$ echo "Usa el menú superior para navegar por las secciones."
-```
+El entorno de trabajo y la pila tecnológica principal de este nodo incluye:
+
+### 🐧 Operating Systems & Linux Administration
+**RHEL**, **Rocky Linux**, **AlmaLinux**, **Debian**, **Ubuntu Server**, **Fedora**, **Arch Linux**. Administración de servicios, gestión de procesos, análisis de rendimiento, *troubleshooting* y diagnóstico de incidencias.
+
+### ☁️ Cloud Infrastructure & Virtualization
+**OpenStack**, **KVM/QEMU**, `libvirt`, **Docker**, **Docker Compose**, **Podman**. Despliegue y gestión de entornos virtualizados y contenedores.
+
+### ☸️ Container Orchestration
+**Kubernetes**, gestión de *workloads*, servicios, *networking* y automatización de despliegues en clúster.
+
+### ⚙️ Infrastructure Automation & Configuration Management
+**Ansible**, **Bash Scripting**, **Git**, `systemd`, `cron`. Automatización de tareas operativas y gestión de configuraciones.
+
+### 🌐 Networking & Load Balancing
+`TCP/IP`, `DNS`, `SSH`, **Nginx**, **HAProxy**, **Apache HTTP Server**, **SSL/TLS**, *reverse proxies* y balanceo de tráfico de red.
+
+### 🛡️ High Availability & Distributed Infrastructure
+Clústeres de servicios, redundancia, tolerancia a fallos, distribución de carga y continuidad operativa del sistema.
+
+### 🗄️ Database Infrastructure
+**MongoDB** (*Replica Sets*), **MySQL**, **PostgreSQL**. Replicación, alta disponibilidad y administración de servicios de bases de datos.
+
+### 🚀 Web & Application Infrastructure
+**Nginx**, **PHP-FPM**, **Apache HTTP Server**, **Laravel**, gestión de procesos de aplicación y servicios en segundo plano.
+
+### 📊 Monitoring & Observability
+**Prometheus**, **Grafana**, análisis de métricas, monitoreo de nodos, gestión de *logs*, alertamiento automatizado y notificaciones mediante **Telegram**.
+
+### 🔄 DevOps & Deployment Automation
+**Git**, **GitHub**, `git-ftp`, automatización de despliegues, *scripting* operativo y estandarización de procedimientos.
+
+### 🔐 Security & Reliability
+Administración de permisos y accesos, *hardening* básico de sistemas, gestión de certificados TLS, *troubleshooting* y análisis de rendimiento.
