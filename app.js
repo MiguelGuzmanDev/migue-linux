@@ -595,6 +595,10 @@ document.addEventListener("DOMContentLoaded", () => {
           <span class="prompt-cmd">cat: ${invalidResource}.md: No existe el fichero o el directorio</span>
         </div>
         
+        <div class="terminal-output-line" style="margin-top: 0.5rem; color: #ff7b72; font-family: monospace;">
+    cat: ${invalidResource}.md: No existe el fichero o el directorio
+  </div>
+  
         <div class="status-err" style="background: #0d1117; border: 1px solid #ff7b72; border-radius: 6px; padding: 1.5rem; margin-top: 1rem;">
           <h2 style="color: #ff7b72; margin-top: 0; font-size: 1.2rem;">
             [HTTP 404] ERROR: Resource Not Found
