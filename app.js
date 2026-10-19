@@ -596,15 +596,15 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         </div>
 
-        <div class="status-err" style="background: #0d1117; border: 1px solid #ff7b72; border-radius: 6px; padding: 1.5rem; margin: 1rem;">
-          <h2 style="color: #ff7b72; margin-top: 0; font-size: 1.2rem;">
+        <div class="terminal-error-box">
+          <h2 class="terminal-error-title">
             [HTTP 404] ERROR: Resource Not Found
           </h2>
-          <p style="color: #c9d1d9; font-family: monospace;">
+          <p class="terminal-error-desc">
             No se encontró la ruta especificada en el servidor virtual <code>migue-linux.com</code>.
           </p>
-          <div style="color: #8b949e; font-family: monospace; font-size: 0.85rem; margin-top: 1rem;">
-            > SUGGESTION: Ejecuta un retorno al directorio raíz mediante <a href="/" style="color: #58a6ff; text-decoration: underline;">[ ~/home ]</a>
+          <div class="terminal-error-suggestion">
+            &gt; SUGGESTION: Ejecuta un retorno al directorio raíz mediante <a href="/">[ ~/home ]</a>
           </div>
         </div>
       </div>

@@ -890,3 +890,48 @@ pre code {
   color: #8b949e;
   font-style: italic;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* --- Estilos para la tarjeta de Error 404 de Terminal --- */
+.terminal-error-box {
+  background: #0d1117;
+  border: 1px solid #ff7b72;
+  border-radius: 6px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+}
+
+.terminal-error-title {
+  color: #ff7b72;
+  margin-top: 0;
+  font-size: 1.2rem;
+}
+
+.terminal-error-desc {
+  color: #c9d1d9;
+  font-family: monospace;
+}
+
+.terminal-error-suggestion {
+  color: #8b949e;
+  font-family: monospace;
+  font-size: 0.85rem;
+  margin-top: 1rem;
+}
+
+.terminal-error-suggestion a {
+  color: #58a6ff;
+  text-decoration: underline;
+}
