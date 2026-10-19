@@ -544,6 +544,14 @@ a:-webkit-any-link {
   border-radius: 4px;
 }
 
+/* 2. REGLA DE CORRECCIÓN: Resetear el padding para bloques dentro de <pre> */
+pre code {
+  padding: 0 !important;
+  background-color: transparent !important;
+  border-radius: 0;
+  display: block;
+}
+
 
 /* Branding Global del Sitio (MigueLinux.com) */
 #site-global-branding {
