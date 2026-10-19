@@ -422,7 +422,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <span class="dot yellow"></span>
                 <span class="dot green"></span>
               </div>
-              <span class="terminal-filename">bash — miguelguzman@Oaxaqueando: ~/${slug}.md</span>
+              <span class="terminal-filename">miguelguzman@Oaxaqueando: ~/${slug}.md</span>
             </div>
             <div class="terminal-command-line">
               <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> 
