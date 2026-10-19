@@ -93,13 +93,25 @@ document.addEventListener("DOMContentLoaded", () => {
       const authorSlug = urlParams.get("author");
 
       if (postSlug) {
-        renderSinglePost(postSlug);
+        // Validar si el post existe en allPosts
+        const postExists = allPosts.find(p => (p.slug || p.file.split("/").pop().replace(/\.md$/, "")) === postSlug);
+        if (postExists) {
+          renderSinglePost(postSlug);
+        } else {
+          renderNotFound(postSlug); // <-- LLAMA AL 404 SI EL POST NO EXISTE
+        }
       } else if (pageSlug) {
         renderStaticPage(pageSlug);
       } else if (authorSlug) {
-        renderAuthorPage(authorSlug).catch((err) => {
-          console.error("Error al renderizar el perfil de autor:", err);
-        });
+        // Validar si el autor existe en allAuthors
+        const authorExists = allAuthors.some(a => a.id === authorSlug);
+        if (authorExists) {
+          renderAuthorPage(authorSlug).catch((err) => {
+            console.error("Error al renderizar el perfil de autor:", err);
+          });
+        } else {
+          renderNotFound(authorSlug); // <-- LLAMA AL 404 SI EL AUTOR NO EXISTE
+        }
       } else {
         renderPosts(currentFilteredPosts);
       }
@@ -404,13 +416,19 @@ document.addEventListener("DOMContentLoaded", () => {
     if (paginationContainer) paginationContainer.innerHTML = '';
 
     fetch("data/pages.json")
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error("pages.json not found");
+        return res.json();
+      })
       .then((pages) => {
         const pageInfo = pages.find((p) => p.slug === slug);
         if (!pageInfo) throw new Error("Página no registrada");
         return fetch(pageInfo.file);
       })
-      .then((res) => res.text())
+      .then((res) => {
+        if (!res.ok) throw new Error("Markdown file not found");
+        return res.text();
+      })
       .then((mdContent) => {
         const cleanMd = mdContent.replace(/^---[\s\S]*?---\s*/, "");
         
@@ -428,7 +446,7 @@ document.addEventListener("DOMContentLoaded", () => {
               <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> 
               <span class="prompt-cmd">cat ~/${slug}.md</span>
             </div>
-            <div class="static-page-content">
+            <div class="static-page-content" style="margin-top: 1.5rem;">
               ${marked.parse(cleanMd)}
             </div>
           </div>
@@ -437,17 +455,8 @@ document.addEventListener("DOMContentLoaded", () => {
         postsContainer.innerHTML = terminalHeaderHTML;
       })
       .catch((err) => {
-        postsContainer.innerHTML = `
-          <div class="terminal-page-wrapper">
-            <div class="terminal-command-line">
-              <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> 
-              <span class="prompt-cmd">cat ~/${slug}.md</span>
-            </div>
-            <div class="status-err" style="padding: 1.5rem;">
-              [ERR_404] cat: ${slug}.md: No existe el fichero o el directorio
-            </div>
-          </div>
-        `;
+        console.warn(`Error al cargar página estática (${slug}):`, err);
+        renderNotFound(slug); // <-- AQUÍ REUTILIZAS TU FUNCIÓN UNIFICADA 404
       });
   }
 
@@ -560,6 +569,43 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
     });
+  }
+
+
+  // Función 404 personalizada con estilo terminal
+  function renderNotFound(invalidResource) {
+    const blogHeader = document.getElementById('blog-header');
+    if (blogHeader) blogHeader.style.display = 'none';
+
+    postsContainer.innerHTML = `
+      <div class="terminal-page-wrapper" style="margin-bottom: 2rem;">
+        <div class="terminal-topbar">
+          <div class="terminal-dots">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+          </div>
+          <span class="terminal-filename">bash — 404 NOT FOUND</span>
+        </div>
+        
+        <div class="terminal-command-line">
+          <span class="prompt-user">miguelguzman@migue-linux</span>:<span class="prompt-path">~#</span> 
+          <span class="prompt-cmd">cat /var/log/httpd/access.log | grep "${invalidResource}"</span>
+        </div>
+        
+        <div class="status-err" style="background: #0d1117; border: 1px solid #ff7b72; border-radius: 6px; padding: 1.5rem; margin-top: 1rem;">
+          <h2 style="color: #ff7b72; margin-top: 0; font-size: 1.2rem;">
+            [HTTP 404] ERROR: Resource Not Found
+          </h2>
+          <p style="color: #c9d1d9; font-family: monospace;">
+            No se encontró la ruta especificada en el servidor virtual <code>migue-linux.com</code>.
+          </p>
+          <div style="color: #8b949e; font-family: monospace; font-size: 0.85rem; margin-top: 1rem;">
+            > SUGGESTION: Ejecuta un retorno al directorio raíz mediante <a href="/" style="color: #58a6ff; text-decoration: underline;">[ ~/home ]</a>
+          </div>
+        </div>
+      </div>
+    `;
   }
 });
 
