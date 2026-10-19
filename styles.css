@@ -323,9 +323,14 @@ a:-webkit-any-link {
 
 /* --- Widget de Footer Terminal --- */
 .cli-footer {
-  margin: 3rem auto 2rem auto;
+  /* --- Versión centrada --- */
+  /*margin: 3rem auto 2rem auto;
   max-width: 580px;
-  padding: 0 1rem;
+  padding: 0 1rem;*/
+
+  /* --- Versión 100% --- */
+  margin: auto ;
+  padding: 0;
 }
 
 .terminal-card {
