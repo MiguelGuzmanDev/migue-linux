@@ -596,10 +596,7 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         </div>
 
-        
-        
-        
-        <div class="status-err" style="background: #0d1117; border: 1px solid #ff7b72; border-radius: 6px; padding: 1.5rem; margin-top: 1rem;">
+        <div class="status-err" style="background: #0d1117; border: 1px solid #ff7b72; border-radius: 6px; padding: 1.5rem; margin: 1rem;">
           <h2 style="color: #ff7b72; margin-top: 0; font-size: 1.2rem;">
             [HTTP 404] ERROR: Resource Not Found
           </h2>
