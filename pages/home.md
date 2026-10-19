@@ -1,6 +1,7 @@
 # 🚀 WELCOME TO MIGUELINUX.COM
 
 ```text
+
 ====================================================================
 miguelguzman@migue-linux:~$ uname -a
 Linux migue-linux 6.1.0 #1 SMP PREEMPT_DYNAMIC x86_64 GNU/Linux
