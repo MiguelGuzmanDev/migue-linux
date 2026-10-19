@@ -590,7 +590,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
         <div class="terminal-command-line">
           <span class="prompt-user">miguelguzman@migue-linux</span>:<span class="prompt-path">~#</span> 
-          <span class="prompt-cmd">cat /var/log/httpd/access.log | grep "${invalidResource}"</span>
+          <span class="prompt-cmd">cat "${invalidResource}.md"</span>
         </div>
         
         <div class="status-err" style="background: #0d1117; border: 1px solid #ff7b72; border-radius: 6px; padding: 1.5rem; margin-top: 1rem;">
