@@ -40,6 +40,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let allAuthors = [];
 
+  // Escapa texto antes de insertarlo en innerHTML (evita XSS con valores de la URL o del JSON)
+  function esc(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
   // Cargar autores
   fetch("data/authors.json")
     .then((res) => res.json())
@@ -55,7 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
       pagesNav.innerHTML = "";
       pages.forEach((page) => {
         const link = document.createElement("a");
-        link.href = `?page=${page.slug}`;
+        link.href = `?page=${encodeURIComponent(page.slug)}`;
         link.textContent = `[ ~/${page.slug} ]`;
         pagesNav.appendChild(link);
       });
@@ -166,10 +176,10 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="terminal-page-wrapper">
           <div class="terminal-command-line">
             <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> 
-            <span class="prompt-cmd">finger ${authorSlug}</span>
+            <span class="prompt-cmd">finger ${esc(authorSlug)}</span>
           </div>
           <div class="status-err" style="padding: 1.5rem; color: #ff7b72;">
-            [ERR_404] User/Author not found: ${authorSlug}
+            [ERR_404] User/Author not found: ${esc(authorSlug)}
           </div>
         </div>
       `;
@@ -191,7 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (mdResponse.ok) {
         const mdText = await mdResponse.text();
         // Usar 'marked.parse' o la librería de Markdown que tengas en el proyecto
-        authorMarkdownHTML = typeof marked !== 'undefined' ? marked.parse(mdText) : `<pre>${mdText}</pre>`;
+        authorMarkdownHTML = typeof marked !== 'undefined' ? marked.parse(mdText) : `<pre>${esc(mdText)}</pre>`;
       }
     } catch (err) {
       console.warn(`No se pudo cargar el archivo extendido data/authors/${profileFile}`, err);
@@ -212,29 +222,29 @@ document.addEventListener("DOMContentLoaded", () => {
             <span class="dot yellow"></span>
             <span class="dot green"></span>
           </div>
-          <span class="terminal-filename">bash — finger ${authorSlug}</span>
+          <span class="terminal-filename">bash — finger ${esc(authorSlug)}</span>
         </div>
         <div class="terminal-command-line">
           <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> 
-          <span class="prompt-cmd">finger ${authorSlug}</span>
+          <span class="prompt-cmd">finger ${esc(authorSlug)}</span>
         </div>
         
         <div class="author-terminal-card">
           <div class="author-card-main">
             <div class="author-avatar">
-              <img src="${avatar}" alt="${name}">
+              <img src="${esc(avatar)}" alt="${esc(name)}">
             </div>
             <div class="author-details">
-              <div class="author-field"><span class="field-label">Login:</span> <span class="field-value">${authorSlug}</span></div>
-              <div class="author-field"><span class="field-label">Name:</span> <span class="field-value font-bold">${name}</span></div>
-              <div class="author-field"><span class="field-label">Role:</span> <span class="field-value highlight">${title}</span></div>
+              <div class="author-field"><span class="field-label">Login:</span> <span class="field-value">${esc(authorSlug)}</span></div>
+              <div class="author-field"><span class="field-label">Name:</span> <span class="field-value font-bold">${esc(name)}</span></div>
+              <div class="author-field"><span class="field-label">Role:</span> <span class="field-value highlight">${esc(title)}</span></div>
               <div class="author-field"><span class="field-label">Host:</span> <span class="field-value">migue-linux.com</span></div>
             </div>
           </div>
           
           <div class="author-bio-section">
             <span class="field-label">> Bio / System Plan:</span>
-            <p class="author-bio-text">${description}</p>
+            <p class="author-bio-text">${esc(description)}</p>
           </div>
         </div>
 
@@ -248,7 +258,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         <div class="author-extended-bio" style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #30363d;">
           <h3 class="author-posts-title" style="margin-bottom: 1rem;">
-            > Últimas ${recentPosts.length} publicaciones de ${name} ${allAuthorPosts.length > 5 ? `<span class="posts-count">(${allAuthorPosts.length} en total)</span>` : ''}:
+            > Últimas ${recentPosts.length} publicaciones de ${esc(name)} ${allAuthorPosts.length > 5 ? `<span class="posts-count">(${allAuthorPosts.length} en total)</span>` : ''}:
           </h3>
 
           <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> 
@@ -275,18 +285,18 @@ document.addEventListener("DOMContentLoaded", () => {
       article.className = "post-card";
 
       const tagsHTML = post.tags && post.tags.length > 0
-        ? `<div class="post-tags">${post.tags.map((t) => `<span class="tag">#${t}</span>`).join(" ")}</div>`
+        ? `<div class="post-tags">${post.tags.map((t) => `<span class="tag">#${esc(t)}</span>`).join(" ")}</div>`
         : "";
 
       const fileName = post.file.split("/").pop();
       const postSlug = post.slug || fileName.replace(/\.md$/, "");
 
       article.innerHTML = `
-        <h2><a href="?post=${postSlug}">cat ${fileName}</a></h2>
-        <p class="post-extract">${post.extracto}</p>
+        <h2><a href="?post=${encodeURIComponent(postSlug)}">cat ${esc(fileName)}</a></h2>
+        <p class="post-extract">${esc(post.extracto)}</p>
         <div class="post-meta">
           ${tagsHTML}
-          <span class="post-date">${post.fecha}</span>
+          <span class="post-date">${esc(post.fecha)}</span>
         </div>
       `;
 
@@ -307,21 +317,21 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="author-card">
         <div class="author-card-header">
           <div class="author-avatar">
-            <img src="${authorAvatar}" alt="${author.name}">
+            <img src="${esc(authorAvatar)}" alt="${esc(author.name)}">
           </div>
           
           <div class="author-info">
-            <span class="author-label">${authorTitle}</span>
-            <h4 class="author-name">${author.name}</h4>
+            <span class="author-label">${esc(authorTitle)}</span>
+            <h4 class="author-name">${esc(author.name)}</h4>
           </div>
         </div>
 
         <div class="author-bio">
-          <p>${author.description}</p>
+          <p>${esc(author.description)}</p>
         </div>
 
         <div class="author-footer">
-          <a href="${author.link || `?author=${author.id}`}" class="more-from-author">Más sobre ${author.name} &rarr;</a>
+          <a href="${esc(author.link || `?author=${encodeURIComponent(author.id)}`)}" class="more-from-author">Más sobre ${esc(author.name)} &rarr;</a>
         </div>
       </div>
     `;
@@ -368,7 +378,7 @@ document.addEventListener("DOMContentLoaded", () => {
       article.className = "post-card";
 
       const tagsHTML = post.tags && post.tags.length > 0
-        ? `<div class="post-tags">${post.tags.map((t) => `<span class="tag">#${t}</span>`).join(" ")}</div>`
+        ? `<div class="post-tags">${post.tags.map((t) => `<span class="tag">#${esc(t)}</span>`).join(" ")}</div>`
         : "";
 
       const fileName = post.file.split("/").pop();
@@ -377,14 +387,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const authorId = post.author || "miguel-guzman";
       const authorInfo = allAuthors.find((a) => a.id === authorId);
       const authorName = authorInfo ? authorInfo.name : "Miguel Guzmán";
-      const authorLink = authorInfo ? authorInfo.link : `?author=${authorId}`;
+      const authorLink = authorInfo ? authorInfo.link : `?author=${encodeURIComponent(authorId)}`;
 
       article.innerHTML = `
-        <h2><a href="?post=${postSlug}">cat ${fileName}</a></h2>
-        <p class="post-extract">${post.extracto}</p>
+        <h2><a href="?post=${encodeURIComponent(postSlug)}">cat ${esc(fileName)}</a></h2>
+        <p class="post-extract">${esc(post.extracto)}</p>
         <div class="post-meta">
           ${tagsHTML}
-          <span class="post-date">${post.fecha} de <a href="${authorLink}" class="author-link">${authorName}</a></span>
+          <span class="post-date">${esc(post.fecha)} de <a href="${esc(authorLink)}" class="author-link">${esc(authorName)}</a></span>
         </div>
       `;
 
@@ -464,11 +474,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 <span class="dot yellow"></span>
                 <span class="dot green"></span>
               </div>
-              <span class="terminal-filename">miguelguzman@Oaxaqueando: ~/${slug}.md</span>
+              <span class="terminal-filename">miguelguzman@Oaxaqueando: ~/${esc(slug)}.md</span>
             </div>
             <div class="terminal-command-line">
               <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> 
-              <span class="prompt-cmd">cat ~/${slug}.md</span>
+              <span class="prompt-cmd">cat ~/${esc(slug)}.md</span>
             </div>
             <div class="static-page-content" style="margin-top: 1.5rem;">
               ${marked.parse(cleanMd)}
@@ -500,10 +510,10 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="terminal-page-wrapper">
           <div class="terminal-command-line">
             <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> 
-            <span class="prompt-cmd">cat posts/${slug}.md</span>
+            <span class="prompt-cmd">cat posts/${esc(slug)}.md</span>
           </div>
           <div class="status-err" style="padding: 1.5rem; color: #ff7b72;">
-            [ERR_404] No post found for slug: ${slug}
+            [ERR_404] No post found for slug: ${esc(slug)}
           </div>
         </div>
       `;
@@ -542,7 +552,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
             <div class="terminal-command-line">
               <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> 
-              <span class="prompt-cmd">cat ${postInfo.file}</span>
+              <span class="prompt-cmd">cat ${esc(postInfo.file)}</span>
             </div>
             <div class="static-page-content">
               ${marked.parse(cleanMd)}
@@ -558,10 +568,10 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="terminal-page-wrapper">
             <div class="terminal-command-line">
               <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> 
-              <span class="prompt-cmd">cat ${postInfo.file}</span>
+              <span class="prompt-cmd">cat ${esc(postInfo.file)}</span>
             </div>
             <div class="status-err" style="padding: 1.5rem; color: #ff7b72;">
-              [ERR_404] No such file: ${postInfo.file}
+              [ERR_404] No such file: ${esc(postInfo.file)}
             </div>
           </div>
         `;
@@ -619,9 +629,9 @@ document.addEventListener("DOMContentLoaded", () => {
         
         <div class="terminal-command-line">
           <span class="prompt-user">miguelguzman@migue-linux</span>:<span class="prompt-path">~#</span> 
-          <span class="prompt-cmd">cat ${invalidResource}.md</span>
+          <span class="prompt-cmd">cat ${esc(invalidResource)}.md</span>
           <div>
-            cat: ~/${invalidResource}: No existe el fichero o el directorio
+            cat: ~/${esc(invalidResource)}: No existe el fichero o el directorio
           </div>
         </div>
 
