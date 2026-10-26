@@ -150,6 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function renderAuthorPage(authorSlug) {
     // Si el autor no existe, disparamos nuestro 404 centralizado
     const authorInfo = allAuthors.find((a) => a.id === authorSlug);
+
     if (!authorInfo) {
       renderNotFound(`finger ${authorSlug}`);
       return;
@@ -159,9 +160,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     postsContainer.innerHTML = "";
     paginationContainer.innerHTML = "";
-
-    // 1. Buscar los datos del autor
-    const authorInfo = allAuthors.find((a) => a.id === authorSlug);
 
     if (!authorInfo) {
       postsContainer.innerHTML = `
