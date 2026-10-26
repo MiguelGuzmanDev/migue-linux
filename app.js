@@ -7,7 +7,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const pathname = window.location.pathname.replace(/^\/|\/$/g, '');
   const trackingPage = pageParam ? `page-${pageParam}` : (pathname || 'home');
 
-  fetch(`/api/tracker.php?page=${encodeURIComponent(trackingPage)}`)
+  function trackPageView(pageIdentifier) {
+    fetch(`/api/tracker.php?page=${encodeURIComponent(trackingPage)}`)
       .then(response => response.json())
       .then(data => {
           if (data.status === 'success') {
@@ -26,6 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
               statusEl.textContent = 'ERR_CONNECTION_FAILED';
           }
       });
+  }
 
   let allPosts = [];
   let currentFilteredPosts = [];
