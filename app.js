@@ -40,6 +40,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let allAuthors = [];
 
+  // Si piden ?page=blog o la raíz, cargamos los posts normales
+  if (pageParam === 'blog' || (!pageParam && !postParam && !authorParam)) {
+    renderPosts(allPosts);
+    trackPageView('blog'); // o 'home' según prefieras registrar
+  } 
+  else if (pageParam) {
+    // Si es otra página estática (como ?page=about)
+    renderStaticPage(pageParam);
+  }
+
   // Cargar autores
   fetch("data/authors.json")
     .then((res) => res.json())
