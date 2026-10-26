@@ -987,6 +987,13 @@ pre code {
 
   .author-details {
     width: 100%;
+    text-align: left;       /* Devuelve el texto a la izquierda */
+    align-items: flex-start; /* Alinea los campos correctamente */
+  }
+
+  .author-field {
+    text-align: left;
+    width: 100%;
   }
 }
 
