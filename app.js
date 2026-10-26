@@ -148,18 +148,18 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
   async function renderAuthorPage(authorSlug) {
-    // Si el autor no existe, disparamos nuestro 404 centralizado
-    const authorInfo = allAuthors.find((a) => a.id === authorSlug);
+    const blogHeader = document.getElementById('blog-header');
+    const cliFooter = document.querySelector('.cli-footer');
 
-    if (!authorInfo) {
-      renderNotFound(`finger ${authorSlug}`);
-      return;
-    }
-
-    document.body.classList.remove('is-404');
+    if (blogHeader) blogHeader.style.display = 'none';
+    if (categoriesBar) categoriesBar.style.display = 'none';
+    if (cliFooter) cliFooter.style.display = 'block';
 
     postsContainer.innerHTML = "";
     paginationContainer.innerHTML = "";
+
+    // 1. Buscar los datos del autor
+    const authorInfo = allAuthors.find((a) => a.id === authorSlug);
 
     if (!authorInfo) {
       postsContainer.innerHTML = `
@@ -598,8 +598,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Función 404 personalizada con estilo terminal
   function renderNotFound(invalidResource) {
+    const blogHeader = document.getElementById('blog-header');
+    const cliFooter = document.querySelector('.cli-footer');
+    const categoriesBar = document.getElementById("categories-bar");
 
-    document.body.classList.add('is-404');
+    if (blogHeader) blogHeader.style.display = 'none';
+    if (cliFooter) cliFooter.style.display = 'none';
+    if (categoriesBar) categoriesBar.style.display = 'none';
     
     postsContainer.innerHTML = `
       <div class="terminal-page-wrapper" style="margin-bottom: 2rem;">
