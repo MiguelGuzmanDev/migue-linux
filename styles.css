@@ -935,3 +935,17 @@ pre code {
   color: #58a6ff;
   text-decoration: underline;
 }
+
+
+
+/* Por defecto, el footer se muestra siempre */
+.cli-footer {
+  display: block;
+}
+
+/* Si el body entra en modo 404, se ocultan las métricas globalmente por CSS */
+body.is-404 .cli-footer,
+body.is-404 #blog-header,
+body.is-404 #categories-bar {
+  display: none !important;
+}

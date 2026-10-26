@@ -2,6 +2,30 @@ document.addEventListener("DOMContentLoaded", () => {
   const categoriesBar = document.getElementById("categories-bar");
   const pagesNav = document.getElementById("pages-nav");
   const postsContainer = document.getElementById("posts-container");
+  const urlParams = new URLSearchParams(window.location.search);
+  const pageParam = urlParams.get('page');
+  const pathname = window.location.pathname.replace(/^\/|\/$/g, '');
+  const currentPage = pageParam ? `page-${pageParam}` : (pathname || 'home');
+
+  fetch(`/api/tracker.php?page=${encodeURIComponent(currentPage)}`)
+      .then(response => response.json())
+      .then(data => {
+          if (data.status === 'success') {
+              const totalEl = document.getElementById('total-views');
+              const pageEl = document.getElementById('page-views');
+
+              if (totalEl) totalEl.textContent = Number(data.total_views).toLocaleString().padStart(8, ' ');
+              if (pageEl) pageEl.textContent = Number(data.page_views).toLocaleString().padStart(8, ' ');
+          }
+      })
+      .catch(err => {
+          console.error("Error al registrar visita:", err);
+          const statusEl = document.getElementById('sys-status');
+          if (statusEl) {
+              statusEl.className = 'status-err';
+              statusEl.textContent = 'ERR_CONNECTION_FAILED';
+          }
+      });
 
   let allPosts = [];
   let currentFilteredPosts = [];
