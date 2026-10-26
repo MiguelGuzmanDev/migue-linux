@@ -5,9 +5,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const urlParams = new URLSearchParams(window.location.search);
   const pageParam = urlParams.get('page');
   const pathname = window.location.pathname.replace(/^\/|\/$/g, '');
-  const currentPage = pageParam ? `page-${pageParam}` : (pathname || 'home');
+  const trackingPage = pageParam ? `page-${pageParam}` : (pathname || 'home');
 
-  fetch(`/api/tracker.php?page=${encodeURIComponent(currentPage)}`)
+  fetch(`/api/tracker.php?page=${encodeURIComponent(trackingPage)}`)
       .then(response => response.json())
       .then(data => {
           if (data.status === 'success') {
