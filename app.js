@@ -7,8 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const pathname = window.location.pathname.replace(/^\/|\/$/g, '');
   const trackingPage = pageParam ? `page-${pageParam}` : (pathname || 'home');
 
-  function trackPageView(pageIdentifier) {
-    fetch(`/api/tracker.php?page=${encodeURIComponent(trackingPage)}`)
+  fetch(`/api/tracker.php?page=${encodeURIComponent(trackingPage)}`)
       .then(response => response.json())
       .then(data => {
           if (data.status === 'success') {
@@ -27,7 +26,6 @@ document.addEventListener("DOMContentLoaded", () => {
               statusEl.textContent = 'ERR_CONNECTION_FAILED';
           }
       });
-  }
 
   let allPosts = [];
   let currentFilteredPosts = [];
@@ -41,16 +39,6 @@ document.addEventListener("DOMContentLoaded", () => {
   postsContainer.after(paginationContainer);
 
   let allAuthors = [];
-
-  // Si piden ?page=blog o la raíz, cargamos los posts normales
-  if (pageParam === 'blog' || (!pageParam && !postParam && !authorParam)) {
-    renderPosts(allPosts);
-    trackPageView('blog'); // o 'home' según prefieras registrar
-  } 
-  else if (pageParam) {
-    // Si es otra página estática (como ?page=about)
-    renderStaticPage(pageParam);
-  }
 
   // Cargar autores
   fetch("data/authors.json")
