@@ -271,6 +271,28 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  function trackPageView(pageIdentifier) {
+    fetch(`/api/tracker.php?page=${encodeURIComponent(pageIdentifier)}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          const totalEl = document.getElementById('total-views');
+          const pageEl = document.getElementById('page-views');
+
+          if (totalEl) totalEl.textContent = Number(data.total_views).toLocaleString().padStart(8, ' ');
+          if (pageEl) pageEl.textContent = Number(data.page_views).toLocaleString().padStart(8, ' ');
+        }
+      })
+      .catch(err => {
+        console.error("Error al registrar visita:", err);
+        const statusEl = document.getElementById('sys-status');
+        if (statusEl) {
+          statusEl.className = 'status-err';
+          statusEl.textContent = 'ERR_CONNECTION_FAILED';
+        }
+      });
+  }
+
   function getAuthorCardHTML(authorId) {
     const author = allAuthors.find((a) => a.id === authorId) || allAuthors.find((a) => a.id === 'miguel-guzman');
 
@@ -368,6 +390,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     renderPaginationControls(posts.length);
+
+    // ==========================================
+    // AQUÍ INVOCAS EL TRACKER PARA EL HOME / BLOG
+    // ==========================================
+    const urlParams = new URLSearchParams(window.location.search);
+    const pageParam = urlParams.get('page');
+    const trackerId = pageParam ? `page-${pageParam}` : 'home';
+    trackPageView(trackerId);
   }
 
   function renderPaginationControls(totalItems) {
