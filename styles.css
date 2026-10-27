@@ -256,15 +256,41 @@ a:hover {
 /* --------------------------------------------------------------------------
    6. Listado de posts (formato `ls -l`)
    -------------------------------------------------------------------------- */
+.ls {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Cada post es una caja con borde, sombra y una franja de color a la izquierda */
 .post-card {
-  margin: 0 -12px;
-  padding: 12px;
-  border-radius: var(--radius-sm);
+  position: relative;
+  padding: 14px 18px 14px 20px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+}
+
+.post-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--border);
   transition: background 0.15s;
 }
 
 .post-card:hover {
-  background: var(--surface-2);
+  border-color: rgba(46, 224, 127, 0.45);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(46, 224, 127, 0.08);
+  transform: translateY(-2px);
+}
+
+.post-card:hover::before {
+  background: var(--green);
 }
 
 .ls-line {
@@ -298,7 +324,7 @@ a:hover {
 }
 
 .post-title {
-  margin: 4px 0 2px;
+  margin: 8px 0 4px;
   font-family: var(--font-sans);
   font-size: 17px;
   font-weight: 600;
@@ -310,7 +336,7 @@ a:hover {
 }
 
 .post-extract {
-  margin: 0 0 4px;
+  margin: 0 0 10px;
   color: var(--muted);
   font-family: var(--font-sans);
   font-size: 14px;
@@ -795,6 +821,11 @@ a:hover {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .post-card,
+  .post-card:hover {
+    transform: none;
   }
 
   .cursor {
