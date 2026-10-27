@@ -6,6 +6,8 @@
 #
 # Y lo necesario para SEO y redes sociales:
 #   p/<slug>.html            -> una página por post con título, descripción e imagen
+#   assets/img/post/AAAA/MM/<id>-<post>.png
+#                            -> tarjeta para compartir, si el post no trae imagen
 #   feed.xml                 -> feed RSS con los últimos posts
 #   sitemap.xml, robots.txt  -> para buscadores
 #
@@ -28,6 +30,7 @@ import html
 import json
 import os
 import re
+import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
 from xml.sax.saxutils import escape as xml_escape
@@ -40,6 +43,8 @@ SITE_URL = "https://migue-linux.com"
 SITE_NAME = "MigueLinux.com"
 SITE_DESCRIPTION = "Bitácora técnica de Miguel Guzmán sobre administración de sistemas Linux, SRE, DevOps, automatización y redes."
 DEFAULT_IMAGE = "assets/img/og-default.png"
+POST_IMAGES_DIR = "assets/img/post"   # Imágenes de posts: AAAA/MM/<id>-<post>.png
+CARD_VERSION = "1"                     # Súbelo si cambias el diseño, para regenerar todas
 POSTS_PAGES_DIR = "p"
 FEED_ITEMS = 20
 TIMEZONE = timezone(timedelta(hours=-6))  # Hora del centro de México
@@ -82,6 +87,25 @@ def parse_front_matter(content):
         else:
             data[key] = val
     return data
+
+def first_image(content):
+    """Ruta de la primera imagen ![...](ruta) del Markdown, ignorando bloques de código."""
+    body = re.sub(r"```.*?```", "", content, flags=re.DOTALL)
+    match = re.search(r"!\[[^\]]*\]\(\s*<?([^)\s>]+)", body)
+    return match.group(1) if match else None
+
+def resolve_image(src, md_path):
+    """Convierte la ruta de la imagen en una ruta desde la raíz del sitio (o deja la URL)."""
+    if src.startswith(("http://", "https://")):
+        return src
+    if src.startswith("/"):
+        return src.lstrip("/")
+    # Rutas relativas al .md (../assets/...) o a la raíz del sitio (assets/...)
+    for base in (os.path.dirname(md_path), "."):
+        candidate = os.path.normpath(os.path.join(base, src))
+        if not candidate.startswith("..") and os.path.isfile(candidate):
+            return candidate
+    return os.path.normpath(src)
 
 def reading_minutes(content):
     body = re.sub(r"^---\s*\n.*?\n---\s*\n", "", content.replace("\r\n", "\n"), count=1, flags=re.DOTALL)
@@ -157,12 +181,145 @@ for filename in sorted(os.listdir(POSTS_DIR)):
     }
     if author:
         entry["author"] = author
-    if fm.get("imagen"):
-        entry["imagen"] = fm["imagen"].lstrip("./")
-        if not os.path.isfile(entry["imagen"]):
-            warn(f"{path}: la imagen '{fm['imagen']}' no existe")
+    # Imagen para compartir: `imagen:` del Front Matter o, si no hay, la primera del .md
+    image = fm.get("imagen") or first_image(content)
+    if image:
+        image = resolve_image(image, path)
+        if image and not image.startswith("http") and not os.path.isfile(image):
+            warn(f"{path}: la imagen '{image}' no existe")
+        elif image:
+            entry["imagen"] = image
 
     posts_by_month.setdefault(fecha[:7], []).append(entry)
+
+# ---------------------------------------------------------------------------
+# 1b. Tarjetas para compartir (estilo WordPress: assets/img/post/AAAA/MM/)
+#     Solo para posts sin imagen. Requiere Pillow: sudo dnf install python3-pillow
+# ---------------------------------------------------------------------------
+try:
+    from PIL import Image, ImageDraw, ImageFont, PngImagePlugin
+except ImportError:
+    Image = None
+
+CARD_GENERATOR = "migue-linux build.sh"
+
+def find_font(bold=False):
+    pattern = "DejaVu Sans Mono:bold" if bold else "DejaVu Sans Mono"
+    try:
+        path = subprocess.run(["fc-match", "-f", "%{file}", pattern], capture_output=True, text=True).stdout
+        if path and os.path.isfile(path):
+            return path
+    except FileNotFoundError:
+        pass
+    for path in ("/usr/share/fonts/dejavu-sans-mono-fonts/DejaVuSansMono" + ("-Bold" if bold else "") + ".ttf",
+                 "/usr/share/fonts/truetype/dejavu/DejaVuSansMono" + ("-Bold" if bold else "") + ".ttf"):
+        if os.path.isfile(path):
+            return path
+    return None
+
+def load_font(size, bold=False):
+    path = find_font(bold)
+    return ImageFont.truetype(path, size) if path else ImageFont.load_default(size)
+
+def wrap(draw, text, font, max_width):
+    lines, line = [], ""
+    for word in text.split():
+        test = f"{line} {word}".strip()
+        if draw.textlength(test, font=font) <= max_width:
+            line = test
+        else:
+            if line:
+                lines.append(line)
+            line = word
+    return lines + ([line] if line else [])
+
+def card_signature(post):
+    return json.dumps([CARD_VERSION, post["titulo"], post["fecha"], post["tags"], post["file"]], ensure_ascii=False)
+
+def render_card(post, out_path):
+    W, H = 1200, 630
+    im = Image.new("RGB", (W, H), "#070c0a")
+    d = ImageDraw.Draw(im)
+    for x in range(0, W, 22):
+        for y in range(0, H, 22):
+            d.point((x, y), fill="#0f1d17")
+
+    # Ventana de terminal
+    d.rounded_rectangle((40, 40, W - 40, H - 40), radius=24, fill="#0d1311", outline="#1e2a26", width=2)
+    d.line((40, 104, W - 40, 104), fill="#1e2a26", width=2)
+    for i, color in enumerate(("#ff5f57", "#febc2e", "#28c840")):
+        d.ellipse((72 + i * 30, 63, 90 + i * 30, 81), fill=color)
+    d.rounded_rectangle((180, 56, W - 72, 88), radius=16, fill="#121a17", outline="#1e2a26")
+    filename = os.path.basename(post["file"])
+    d.text((200, 62), f"miguelguzman@Oaxaqueando: ~/posts/{filename}"[:80], font=load_font(18), fill="#7d8c86")
+
+    # Comando
+    prompt_font = load_font(26)
+    d.text((88, 140), "~$ ", font=prompt_font, fill="#2ee07f")
+    d.text((88 + d.textlength("~$ ", font=prompt_font), 140), f"cat {filename}"[:60], font=prompt_font, fill="#e3ebe7")
+
+    # Título: lo más grande que quepa en 3 líneas
+    for size in (64, 58, 52, 46, 40):
+        title_font = load_font(size, bold=True)
+        lines = wrap(d, post["titulo"], title_font, W - 176)
+        if len(lines) <= 3:
+            break
+    lines = lines[:3]
+    y = 200
+    for line in lines:
+        d.text((88, y), line, font=title_font, fill="#2ee07f")
+        y += int(size * 1.2)
+
+    # Tags y pie
+    tags = "  ".join(f"#{t}" for t in post["tags"][:5])
+    d.text((88, H - 150), tags, font=load_font(26), fill="#f0a548")
+    d.text((88, H - 100), f"{post['fecha']}  ·  migue-linux.com", font=load_font(22), fill="#7d8c86")
+    d.rectangle((W - 112, H - 104, W - 94, H - 74), fill="#2ee07f")
+
+    meta = PngImagePlugin.PngInfo()
+    meta.add_text("generator", CARD_GENERATOR)
+    meta.add_text("card", card_signature(post))
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    im.save(out_path, pnginfo=meta, optimize=True)
+
+def card_is_current(path, post):
+    try:
+        with Image.open(path) as im:
+            return im.text.get("card") == card_signature(post)
+    except (FileNotFoundError, OSError):
+        return False
+
+generated_cards = set()
+cards_made = 0
+for month, month_posts in posts_by_month.items():
+    year, mm = month.split("-")
+    for post in month_posts:
+        if "imagen" in post:
+            continue
+        # Mismo nombre que usarías a mano: <id>-<nombre-del-archivo>.png
+        card = f"{POST_IMAGES_DIR}/{year}/{mm}/{post['slug']}.png"
+        if Image is None:
+            continue
+        generated_cards.add(card)
+        if not card_is_current(card, post):
+            render_card(post, card)
+            cards_made += 1
+        post["imagen"] = card
+
+if Image is None:
+    warn("Pillow no está instalado: los posts sin imagen usarán la imagen por defecto (sudo dnf install python3-pillow)")
+else:
+    # Borra tarjetas generadas que ya no corresponden a ningún post (nunca toca tus imágenes)
+    for root, _, files in os.walk(POST_IMAGES_DIR):
+        for name in files:
+            path = os.path.join(root, name)
+            if not name.endswith(".png") or path in generated_cards:
+                continue
+            with Image.open(path) as im:
+                generated = im.text.get("generator") == CARD_GENERATOR
+            if generated:
+                os.remove(path)
+    print(f"✅ {POST_IMAGES_DIR}/ ({len(generated_cards)} tarjetas, {cards_made} nuevas o actualizadas)")
 
 # ---------------------------------------------------------------------------
 # 2. Escribir data/posts_YYYY-MM.json y data/months.json
@@ -199,7 +356,7 @@ all_posts = sorted(
 )
 
 def absolute(path):
-    return f"{SITE_URL}/{path}"
+    return path if path.startswith("http") else f"{SITE_URL}/{path}"
 
 def post_url(post):
     return absolute(f"{POSTS_PAGES_DIR}/{post['slug']}.html")
