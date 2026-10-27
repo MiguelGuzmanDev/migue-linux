@@ -9,3 +9,7 @@ manual.md
 # Locales
 buildv2.sh
 buildv3.sh
+
+# Logs del contador (solo se versiona el .htaccess que los protege)
+logs/*
+!logs/.htaccess

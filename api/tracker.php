@@ -13,6 +13,12 @@ if (!is_dir($logsDir)) {
     mkdir($logsDir, 0755, true);
 }
 
+// Bloquear el acceso web a los logs (contienen IPs de los visitantes)
+$htaccessFile = $logsDir . '/.htaccess';
+if (!file_exists($htaccessFile)) {
+    file_put_contents($htaccessFile, "Require all denied\n", LOCK_EX);
+}
+
 // Función para capturar IP real
 function getClientIP() {
     if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
