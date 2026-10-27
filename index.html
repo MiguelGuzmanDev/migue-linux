@@ -6,67 +6,68 @@
   <title>MigueLinux@Oaxaqueando: ~</title>
 
   <link rel="icon" type="image/x-icon" href="./favicon.ico">
+
+  <!-- Tipografías: monoespaciada para la terminal, sans para leer los posts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Space+Grotesk:wght@400;500;600;700&display=swap">
+
   <link rel="stylesheet" href="styles.css">
-  <!-- Convertidor de Markdown a HTML (ultra ligero) -->
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <!-- Markdown -> HTML y resaltado de sintaxis (versiones fijas) -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 </head>
 <body>
 
-  <header>
-    <!-- Branding Principal del Sitio -->
-    <div id="site-global-branding">
-      <div class="terminal-prompt">miguelguzman@Oaxaqueando:<span>~#</span> echo "$SITE_NAME :: $TAGLINE"</div>
-      <h1 class="global-title"><a href="./">MigueLinux<span class="tld">.com</span></a></h1>
-      <p class="global-tagline"><span class="comment-symbol">#</span> Todos tenemos algo que compartir</p>
+  <div class="terminal-window">
+    <!-- Barra de la ventana: 3 puntos + ruta actual -->
+    <div class="window-bar">
+      <div class="window-dots"><i></i><i></i><i></i></div>
+      <div class="window-path"><span class="ps1-host">miguelguzman@Oaxaqueando:</span> <b id="window-path">~/posts</b></div>
     </div>
 
-    <!-- Navegación de Páginas Estáticas -->
-    <nav id="pages-nav">
-      <a href="./">[ ~/posts ]</a>
-      <!-- Se inyectan las páginas estáticas aquí -->
-    </nav>
-    
-    <!-- Encabezado exclusivo del Blog -->
-    <div id="blog-header">
-      <div class="terminal-prompt">miguelguzman@Oaxaqueando:<span>~#</span> ./blog.sh --list</div>
-      <h1>SysOps & Linux Infra Log</h1>
-      <p>Bitácora técnica sobre Linux, automatización, SRE y redes.</p>
-    </div>
+    <div class="window-body">
+      <header>
+        <!-- Navegación de páginas (se inyecta desde data/pages.json) -->
+        <nav id="pages-nav">
+          <a href="./">~/posts</a>
+        </nav>
 
-    <!-- Filtros de Categorías -->
-    <div id="categories-bar" class="categories-container">
-      <!-- Se inyectan los botones de categoría aquí -->
-    </div>
-  </header>
-
-  <main id="posts-container">
-    <!-- Contenido inyectado dinámicamente mediante app.js -->
-  </main>
-
-  <!-- Métricas estilo terminal bash (Neofetch / CLI) -->
-  <footer class="cli-footer">
-    <div class="terminal-card">
-      <div class="terminal-header">
-        <span class="btn-close"></span>
-        <span class="btn-min"></span>
-        <span class="btn-max"></span>
-        <span class="terminal-title">bash</span>
-      </div>
-      <div class="terminal-body">
-        <div class="cli-line">
-          <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> <span class="command">./metrics.sh --summary</span>
+        <!-- Branding principal del sitio -->
+        <div id="site-global-branding">
+          <div class="cmd"><span class="ps1"><span class="ps1-host">miguelguzman@Oaxaqueando:</span><span class="ps1-path">~</span>$</span> echo $SITE_NAME</div>
+          <h1 class="global-title"><a href="./">MigueLinux<span class="tld">.com</span></a></h1>
+          <p class="global-tagline">Todos tenemos algo que <em>compartir</em>. Bitácora técnica sobre Linux, SRE y redes.</p>
         </div>
-        <div class="cli-output">
-          <div class="metric-row"><span class="key">PAGE_VIEWS   :</span> <span id="page-views" class="val">--</span></div>
-          <div class="metric-row"><span class="key">TOTAL_VISITS :</span> <span id="total-views" class="val">--</span></div>
-          <div class="metric-row"><span class="key">SYSTEM_STATUS:</span> <span id="sys-status" class="status-ok">ONLINE [200 OK]</span></div>
+
+        <!-- Filtros de categorías (solo en el listado) -->
+        <div id="blog-header">
+          <div class="cmd"><span class="ps1"><span class="ps1-host">miguelguzman@Oaxaqueando:</span><span class="ps1-path">~</span>$</span> ls --categorias</div>
+          <div id="categories-bar" class="categories-container">
+            <!-- Se inyectan los botones de categoría aquí -->
+          </div>
         </div>
-        <div class="cli-line prompt-footer">
-          <span class="prompt-user">miguelguzman@Oaxaqueando</span>:<span class="prompt-path">~#</span> <span class="cursor">_</span>
+      </header>
+
+      <main id="posts-container">
+        <!-- Contenido inyectado dinámicamente mediante app.js -->
+      </main>
+
+      <!-- Métricas estilo salida de un script -->
+      <footer class="cli-footer">
+        <div class="cmd"><span class="ps1"><span class="ps1-host">miguelguzman@Oaxaqueando:</span><span class="ps1-path">~</span>$</span> ./metrics.sh --summary</div>
+        <div class="metrics">
+          <span class="key">PAGE_VIEWS</span><span id="page-views" class="val">--</span>
+          <span class="key">TOTAL_VISITS</span><span id="total-views" class="val">--</span>
+          <span class="key">SYSTEM_STATUS</span><span id="sys-status" class="status-ok">200 OK</span>
         </div>
-      </div>
+      </footer>
+
+      <div class="cmd prompt-idle"><span class="ps1"><span class="ps1-host">miguelguzman@Oaxaqueando:</span><span class="ps1-path">~</span>$</span> <span class="cursor" aria-hidden="true"></span></div>
     </div>
-  </footer>
+  </div>
+
   <script src="app.js"></script>
 </body>
 </html>

@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const DEFAULT_AVATAR = "https://migue-linux.com/assets/img/authors/default.avif";
   const POSTS_PER_PAGE = 5;
   const AUTHOR_RECENT_POSTS = 5;
+  const NEW_POST_DAYS = 14; // Días que un post muestra la etiqueta NUEVO
 
   // =========================================================================
   // 2. Elementos del DOM
@@ -16,6 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const pagesNav = document.getElementById("pages-nav");
   const postsContainer = document.getElementById("posts-container");
   const cliFooter = document.querySelector(".cli-footer");
+  const windowPath = document.getElementById("window-path");
 
   // Contenedor dinámico de paginación
   const paginationContainer = document.createElement("div");
@@ -37,6 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let allAuthors = [];
   let allPages = [];
   let currentFilteredPosts = [];
+  let currentCategory = null;
   let currentPage = 1;
 
   // =========================================================================
@@ -81,65 +84,76 @@ document.addEventListener("DOMContentLoaded", () => {
     return allAuthors.find((a) => a.id === authorId);
   }
 
+  function isNewPost(post) {
+    const published = new Date(post.fecha);
+    if (isNaN(published)) return false;
+    return (Date.now() - published.getTime()) / 86400000 <= NEW_POST_DAYS;
+  }
+
   // Muestra u oculta las secciones fijas del layout según la vista
-  function setLayout({ header = false, categories = false, footer = true } = {}) {
+  function setLayout({ header = false, footer = true } = {}) {
     if (blogHeader) blogHeader.style.display = header ? "block" : "none";
-    if (categoriesBar) categoriesBar.style.display = categories ? "flex" : "none";
     if (cliFooter) cliFooter.style.display = footer ? "block" : "none";
-    if (!categories) paginationContainer.innerHTML = "";
+    if (!header) paginationContainer.innerHTML = "";
+  }
+
+  // Ruta que se muestra en la barra de la ventana y en la pestaña del navegador
+  function setWindowPath(path) {
+    if (windowPath) windowPath.textContent = path;
+    document.title = `MigueLinux@Oaxaqueando: ${path}`;
   }
 
   // =========================================================================
   // 5. Plantillas HTML
   // =========================================================================
-  function promptLineHTML(command, user = PROMPT_USER) {
-    return `<span class="prompt-user">${esc(user)}</span>:<span class="prompt-path">~#</span>
-      <span class="prompt-cmd">${esc(command)}</span>`;
+  function promptLineHTML(command) {
+    const [host] = PROMPT_USER.split(":");
+    return `<div class="cmd"><span class="ps1"><span class="ps1-host">${esc(host)}:</span><span class="ps1-path">~</span>$</span> <span class="prompt-cmd">${esc(command)}</span></div>`;
   }
 
-  // Ventana de terminal: barra con los 3 puntos + línea de comando + contenido
-  function terminalHTML({ title, command, body = "", promptUser, afterCommand = "", style = "" }) {
+  // Una "vista" es un comando ejecutado + su salida
+  function terminalHTML({ path, command, body = "", afterCommand = "" }) {
+    setWindowPath(path);
     return `
-      <div class="terminal-page-wrapper"${style ? ` style="${style}"` : ""}>
-        <div class="terminal-topbar">
-          <div class="terminal-dots">
-            <span class="dot red"></span>
-            <span class="dot yellow"></span>
-            <span class="dot green"></span>
-          </div>
-          <span class="terminal-filename">${esc(title)}</span>
-        </div>
-        <div class="terminal-command-line">
-          ${promptLineHTML(command, promptUser)}
-          ${afterCommand}
-        </div>
+      <section class="view">
+        ${promptLineHTML(command)}
+        ${afterCommand}
         ${body}
-      </div>
+      </section>
     `;
   }
 
-  // Tarjeta de un post en los listados (portada y perfil de autor)
+  function tagsHTML(tags) {
+    return tags && tags.length > 0
+      ? `<span class="post-tags">${tags.map((t) => `<span class="tag">#${esc(t)}</span>`).join(" ")}</span>`
+      : "";
+  }
+
+  // Un post en los listados, con formato de `ls -l`
   function postCardHTML(post, { showAuthor }) {
     const fileName = post.file.split("/").pop();
-    const tagsHTML = post.tags && post.tags.length > 0
-      ? `<div class="post-tags">${post.tags.map((t) => `<span class="tag">#${esc(t)}</span>`).join(" ")}</div>`
-      : "";
+    const href = `?post=${encodeURIComponent(getPostSlug(post))}`;
 
-    let dateHTML = esc(post.fecha);
+    let authorHTML = "";
     if (showAuthor) {
       const authorId = post.author || DEFAULT_AUTHOR;
       const authorInfo = findAuthor(authorId);
       const authorName = authorInfo ? authorInfo.name : "Miguel Guzmán";
       const authorLink = authorInfo ? authorInfo.link : `?author=${encodeURIComponent(authorId)}`;
-      dateHTML += ` de <a href="${esc(authorLink)}" class="author-link">${esc(authorName)}</a>`;
+      authorHTML = `<span class="post-author">por <a href="${esc(authorLink)}" class="author-link">${esc(authorName)}</a></span>`;
     }
 
     return `
-      <h2><a href="?post=${encodeURIComponent(getPostSlug(post))}">cat ${esc(fileName)}</a></h2>
+      <div class="ls-line">
+        <span class="perm">-rw-r--r--</span>
+        <span class="post-date">${esc(post.fecha)}</span>
+        <a class="fname" href="${href}">${esc(fileName)}</a>${isNewPost(post) ? '<span class="badge">NUEVO</span>' : ""}
+      </div>
+      <h2 class="post-title"><a href="${href}">${esc(post.titulo || fileName)}</a></h2>
       <p class="post-extract">${esc(post.extracto)}</p>
       <div class="post-meta">
-        ${tagsHTML}
-        <span class="post-date">${dateHTML}</span>
+        ${tagsHTML(post.tags)}
+        ${authorHTML}
       </div>
     `;
   }
@@ -182,6 +196,50 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
+  // Convierte cada <pre><code> en una caja con encabezado, resaltado y botón copiar
+  function enhanceCodeBlocks(root) {
+    root.querySelectorAll("pre > code").forEach((code) => {
+      const pre = code.parentElement;
+      const langClass = [...code.classList].find((c) => c.startsWith("language-"));
+      const lang = langClass ? langClass.replace("language-", "") : "texto";
+
+      if (typeof hljs !== "undefined" && langClass && hljs.getLanguage(lang)) {
+        hljs.highlightElement(code);
+      }
+
+      const block = document.createElement("div");
+      block.className = "code-block";
+      block.innerHTML = `
+        <div class="code-head">
+          <span class="led"></span>
+          <span class="code-lang">${esc(lang)}</span>
+          <button type="button" class="copy-btn">copiar</button>
+        </div>
+      `;
+      pre.replaceWith(block);
+      block.appendChild(pre);
+
+      const copyBtn = block.querySelector(".copy-btn");
+      copyBtn.addEventListener("click", async () => {
+        // En bloques de shell no copiamos el "$ " del prompt
+        const text = /^(bash|sh|shell|zsh|console)$/.test(lang)
+          ? code.innerText.replace(/^\$ /gm, "")
+          : code.innerText;
+        try {
+          await navigator.clipboard.writeText(text);
+          copyBtn.textContent = "copiado ✓";
+          copyBtn.classList.add("copied");
+        } catch {
+          copyBtn.textContent = "error";
+        }
+        setTimeout(() => {
+          copyBtn.textContent = "copiar";
+          copyBtn.classList.remove("copied");
+        }, 1500);
+      });
+    });
+  }
+
   // =========================================================================
   // 6. Navegación y categorías
   // =========================================================================
@@ -190,7 +248,7 @@ document.addEventListener("DOMContentLoaded", () => {
     allPages.forEach((page) => {
       const link = document.createElement("a");
       link.href = `?page=${encodeURIComponent(page.slug)}`;
-      link.textContent = `[ ~/${page.slug} ]`;
+      link.textContent = `~/${page.slug}`;
       pagesNav.appendChild(link);
     });
     updateActiveNav();
@@ -215,8 +273,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const addButton = (label, categoryName, active = false) => {
       const btn = document.createElement("button");
+      btn.type = "button";
       btn.className = active ? "category-btn active" : "category-btn";
-      btn.textContent = `[ ${label} ]`;
+      btn.textContent = label;
       btn.addEventListener("click", () => filterByCategory(categoryName, btn));
       categoriesBar.appendChild(btn);
     };
@@ -229,6 +288,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".category-btn").forEach((btn) => btn.classList.remove("active"));
     targetBtn.classList.add("active");
 
+    currentCategory = categoryName;
     currentFilteredPosts = categoryName
       ? allPosts.filter((post) => post.categoria && post.categoria.toLowerCase() === categoryName.toLowerCase())
       : allPosts;
@@ -243,17 +303,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Listado principal de posts con paginación
   function renderPosts(posts) {
-    setLayout({ header: true, categories: true });
-    postsContainer.innerHTML = "";
+    setLayout({ header: true });
+
+    const command = currentCategory
+      ? `ls -lt ~/posts | grep ${currentCategory.toLowerCase()}`
+      : "ls -lt ~/posts";
 
     if (posts.length === 0) {
-      postsContainer.innerHTML = "<p class='no-posts'>No hay publicaciones en esta categoría.</p>";
+      postsContainer.innerHTML = terminalHTML({
+        path: "~/posts",
+        command,
+        body: "<p class='no-posts'>No hay publicaciones en esta categoría.</p>",
+      });
       paginationContainer.innerHTML = "";
       return;
     }
 
+    postsContainer.innerHTML = terminalHTML({
+      path: "~/posts",
+      command,
+      body: `<div class="ls" id="posts-list"></div>`,
+    });
+
     const start = (currentPage - 1) * POSTS_PER_PAGE;
-    appendPostCards(postsContainer, posts.slice(start, start + POSTS_PER_PAGE), { showAuthor: true });
+    appendPostCards(document.getElementById("posts-list"), posts.slice(start, start + POSTS_PER_PAGE), { showAuthor: true });
     renderPaginationControls(posts.length);
   }
 
@@ -270,17 +343,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const prevBtn = document.createElement("button");
     prevBtn.className = "pagination-btn";
-    prevBtn.textContent = "[ <-- Anterior ]";
+    prevBtn.textContent = "← anterior";
     prevBtn.disabled = currentPage === 1;
     prevBtn.addEventListener("click", () => currentPage > 1 && goTo(currentPage - 1));
 
     const pageIndicator = document.createElement("span");
     pageIndicator.className = "pagination-info";
-    pageIndicator.textContent = `Página ${currentPage} de ${totalPages}`;
+    pageIndicator.textContent = `página ${currentPage}/${totalPages}`;
 
     const nextBtn = document.createElement("button");
     nextBtn.className = "pagination-btn";
-    nextBtn.textContent = "[ Siguiente --> ]";
+    nextBtn.textContent = "siguiente →";
     nextBtn.disabled = currentPage === totalPages;
     nextBtn.addEventListener("click", () => currentPage < totalPages && goTo(currentPage + 1));
 
@@ -300,10 +373,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const mdContent = await res.text();
 
       postsContainer.innerHTML = terminalHTML({
-        title: `${PROMPT_USER}: ~/${slug}.md`,
+        path: `~/${slug}.md`,
         command: `cat ~/${slug}.md`,
-        body: `<div class="static-page-content" style="margin-top: 1.5rem;">${renderMarkdown(mdContent)}</div>`,
+        body: `<div class="static-page-content">${renderMarkdown(mdContent)}</div>`,
       });
+      enhanceCodeBlocks(postsContainer);
     } catch (err) {
       console.warn(`Error al cargar página estática (${slug}):`, err);
       renderNotFound(slug);
@@ -331,13 +405,20 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       postsContainer.innerHTML = terminalHTML({
-        title: "bash — 80x24",
+        path: `~/${postInfo.file}`,
         command: `cat ${postInfo.file}`,
-        body: `<div class="static-page-content">
-          ${renderMarkdown(mdContent)}
+        body: `
+          <div class="post-meta post-meta-single">
+            ${tagsHTML(postInfo.tags)}
+            <span class="post-date">${esc(postInfo.fecha)}</span>
+          </div>
+          <div class="static-page-content">
+            ${renderMarkdown(mdContent)}
+          </div>
           ${authorCardHTML(authorId || DEFAULT_AUTHOR)}
-        </div>`,
+        `,
       });
+      enhanceCodeBlocks(postsContainer);
     } catch (err) {
       console.warn(`Error al cargar el post (${slug}):`, err);
       renderNotFound(slug);
@@ -386,39 +467,32 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         </div>
         <div class="author-bio-section">
-          <span class="field-label">> Bio / System Plan:</span>
+          <span class="field-label">Plan:</span>
           <p class="author-bio-text">${esc(description)}</p>
         </div>
       </div>
 
-      ${extendedBioHTML
-        ? `<div class="author-extended-bio" style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px dashed #30363d;">
-            ${extendedBioHTML}
-           </div>`
-        : ""}
+      ${extendedBioHTML ? `<div class="static-page-content author-extended-bio">${extendedBioHTML}</div>` : ""}
 
-      <div class="author-extended-bio" style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #30363d;">
-        <h3 class="author-posts-title" style="margin-bottom: 1rem;">
-          > Últimas ${recentPosts.length} publicaciones de ${esc(name)} ${totalHTML}:
-        </h3>
-        ${promptLineHTML("tail -n 5 ~/posts.json")}
-        <div id="author-posts-list"></div>
-      </div>
+      ${promptLineHTML(`ls -lt ~/posts --author=${authorSlug} | head -n ${AUTHOR_RECENT_POSTS}`)}
+      <p class="author-posts-title">Últimas ${recentPosts.length} publicaciones de ${esc(name)} ${totalHTML}</p>
+      <div class="ls" id="author-posts-list"></div>
     `;
 
     postsContainer.innerHTML = terminalHTML({
-      title: `bash — finger ${authorSlug}`,
+      path: `~/users/${authorSlug}`,
       command: `finger ${authorSlug}`,
       body,
-      style: "margin-bottom: 2rem;",
     });
+    enhanceCodeBlocks(postsContainer);
 
+    const postsList = document.getElementById("author-posts-list");
     if (recentPosts.length === 0) {
-      postsContainer.insertAdjacentHTML("beforeend", "<p class='no-posts'>No hay publicaciones registradas para este autor.</p>");
+      postsList.innerHTML = "<p class='no-posts'>No hay publicaciones registradas para este autor.</p>";
       return;
     }
 
-    appendPostCards(document.getElementById("author-posts-list"), recentPosts, { showAuthor: false });
+    appendPostCards(postsList, recentPosts, { showAuthor: false });
   }
 
   // 404 con estilo terminal (post, autor o página inexistente)
@@ -426,19 +500,17 @@ document.addEventListener("DOMContentLoaded", () => {
     setLayout({ footer: false });
 
     postsContainer.innerHTML = terminalHTML({
-      title: "bash — 404 NOT FOUND",
+      path: "404",
       command: `cat ${invalidResource}.md`,
-      promptUser: "miguelguzman@migue-linux",
-      style: "margin-bottom: 2rem;",
-      afterCommand: `<div>cat: ~/${esc(invalidResource)}: No existe el fichero o el directorio</div>`,
+      afterCommand: `<div class="cmd-output error-line">cat: ${esc(invalidResource)}.md: No existe el fichero o el directorio</div>`,
       body: `
         <div class="terminal-error-box">
-          <h2 class="terminal-error-title">[HTTP 404] ERROR: Resource Not Found</h2>
+          <div class="terminal-error-title">404 <small>NOT FOUND</small></div>
           <p class="terminal-error-desc">
-            No se encontró la ruta especificada en el servidor virtual <code>migue-linux.com</code>.
+            No se encontró la ruta especificada en <code>migue-linux.com</code>.
           </p>
-          <div class="terminal-error-suggestion">
-            &gt; SUGGESTION: Ejecuta un retorno al directorio raíz mediante <a href="/">[ ~/home ]</a>
+          <div class="callout">
+            Vuelve al directorio principal con <a href="./">cd ~/posts</a>
           </div>
         </div>
       `,
@@ -458,8 +530,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (data.status !== "success") return;
         const totalEl = document.getElementById("total-views");
         const pageEl = document.getElementById("page-views");
-        if (totalEl) totalEl.textContent = Number(data.total_views).toLocaleString().padStart(8, " ");
-        if (pageEl) pageEl.textContent = Number(data.page_views).toLocaleString().padStart(8, " ");
+        if (totalEl) totalEl.textContent = Number(data.total_views).toLocaleString();
+        if (pageEl) pageEl.textContent = Number(data.page_views).toLocaleString();
       })
       .catch((err) => {
         console.error("Error al registrar visita:", err);
