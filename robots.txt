@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /logs/
+Disallow: /api/
+
+Sitemap: https://migue-linux.com/sitemap.xml

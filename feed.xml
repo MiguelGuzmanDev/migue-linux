@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>MigueLinux.com</title>
+    <link>https://migue-linux.com/</link>
+    <description>Bitácora técnica de Miguel Guzmán sobre administración de sistemas Linux, SRE, DevOps, automatización y redes.</description>
+    <language>es-MX</language>
+    <lastBuildDate>Thu, 01 Oct 2026 12:00:00 -0600</lastBuildDate>
+    <atom:link href="https://migue-linux.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Ajuste de parámetros sysctl para servidores de alto tráfico</title>
+      <link>https://migue-linux.com/p/107A-optimizacion-kernel107A.html</link>
+      <guid isPermaLink="true">https://migue-linux.com/p/107A-optimizacion-kernel107A.html</guid>
+      <pubDate>Thu, 01 Oct 2026 12:00:00 -0600</pubDate>
+      <description>Optimizando somaxconn y TCP reuse para evitar cuellos de botella.</description>
+      <category>linux</category>
+      <category>kernel</category>
+      <category>sysctl</category>
+    </item>
+    <item>
+      <title>Ajuste de parámetros sysctl para servidores de alto tráfico</title>
+      <link>https://migue-linux.com/p/106D-optimizacion-kernel106A.html</link>
+      <guid isPermaLink="true">https://migue-linux.com/p/106D-optimizacion-kernel106A.html</guid>
+      <pubDate>Thu, 01 Oct 2026 12:00:00 -0600</pubDate>
+      <description>Optimizando somaxconn y TCP reuse para evitar cuellos de botella.</description>
+      <category>linux</category>
+      <category>kernel</category>
+      <category>sysctl</category>
+    </item>
+    <item>
+      <title>Ajuste de parámetros sysctl para servidores de alto tráfico</title>
+      <link>https://migue-linux.com/p/105A-optimizacion-kernel105A.html</link>
+      <guid isPermaLink="true">https://migue-linux.com/p/105A-optimizacion-kernel105A.html</guid>
+      <pubDate>Thu, 01 Oct 2026 12:00:00 -0600</pubDate>
+      <description>Optimizando somaxconn y TCP reuse para evitar cuellos de botella.</description>
+      <category>linux</category>
+      <category>kernel</category>
+      <category>sysctl</category>
+    </item>
+    <item>
+      <title>Ajuste de parámetros sysctl para servidores de alto tráfico</title>
+      <link>https://migue-linux.com/p/111A-optimizacion-kernel11.html</link>
+      <guid isPermaLink="true">https://migue-linux.com/p/111A-optimizacion-kernel11.html</guid>
+      <pubDate>Mon, 28 Sep 2026 12:00:00 -0600</pubDate>
+      <description>Optimizando somaxconn y TCP reuse para evitar cuellos de botella.</description>
+      <category>linux</category>
+      <category>kernel</category>
+      <category>sysctl</category>
+      <category>otro</category>
+      <category>uttt</category>
+    </item>
+    <item>
+      <title>Ajuste de parámetros sysctl para servidores de alto tráfico</title>
+      <link>https://migue-linux.com/p/110A-optimizacion-kernel10.html</link>
+      <guid isPermaLink="true">https://migue-linux.com/p/110A-optimizacion-kernel10.html</guid>
+      <pubDate>Mon, 28 Sep 2026 12:00:00 -0600</pubDate>
+      <description>Optimizando somaxconn y TCP reuse para evitar cuellos de botella.</description>
+      <category>linux</category>
+      <category>kernel</category>
+      <category>sysctl</category>
+      <category>otro</category>
+      <category>uttt</category>
+    </item>
+    <item>
+      <title>Ajuste de parámetros sysctl para servidores de alto tráfico</title>
+      <link>https://migue-linux.com/p/104B-optimizacion-kernel2.html</link>
+      <guid isPermaLink="true">https://migue-linux.com/p/104B-optimizacion-kernel2.html</guid>
+      <pubDate>Mon, 28 Sep 2026 12:00:00 -0600</pubDate>
+      <description>Optimizando somaxconn y TCP reuse para evitar cuellos de botella.</description>
+      <category>linux</category>
+      <category>kernel</category>
+      <category>sysctl</category>
+    </item>
+    <item>
+      <title>Ajuste de parámetros sysctl para servidores de alto tráfico</title>
+      <link>https://migue-linux.com/p/103A-optimizacion-kernel3.html</link>
+      <guid isPermaLink="true">https://migue-linux.com/p/103A-optimizacion-kernel3.html</guid>
+      <pubDate>Mon, 28 Sep 2026 12:00:00 -0600</pubDate>
+      <description>Optimizando somaxconn y TCP reuse para evitar cuellos de botella.</description>
+      <category>linux</category>
+      <category>kernel</category>
+      <category>sysctl</category>
+    </item>
+    <item>
+      <title>Ajuste de parámetros sysctl para servidores de alto tráfico</title>
+      <link>https://migue-linux.com/p/102C-optimizacion-kernel.html</link>
+      <guid isPermaLink="true">https://migue-linux.com/p/102C-optimizacion-kernel.html</guid>
+      <pubDate>Mon, 28 Sep 2026 12:00:00 -0600</pubDate>
+      <description>Optimizando somaxconn y TCP reuse para evitar cuellos de botella.</description>
+      <category>linux</category>
+      <category>kernel</category>
+      <category>sysctl</category>
+    </item>
+    <item>
+      <title>Ajuste de parámetros sysctl para servidores de alto tráfico</title>
+      <link>https://migue-linux.com/p/101K-optimizacion-kernel103c.html</link>
+      <guid isPermaLink="true">https://migue-linux.com/p/101K-optimizacion-kernel103c.html</guid>
+      <pubDate>Mon, 28 Sep 2026 12:00:00 -0600</pubDate>
+      <description>Optimizando somaxconn y TCP reuse para evitar cuellos de botella.</description>
+      <category>linux</category>
+      <category>kernel</category>
+      <category>sysctl</category>
+    </item>
+    <item>
+      <title>Ajuste de parámetros sysctl para servidores de alto tráfico</title>
+      <link>https://migue-linux.com/p/101C-optimizacion-kernel101c.html</link>
+      <guid isPermaLink="true">https://migue-linux.com/p/101C-optimizacion-kernel101c.html</guid>
+      <pubDate>Mon, 28 Sep 2026 12:00:00 -0600</pubDate>
+      <description>Optimizando somaxconn y TCP reuse para evitar cuellos de botella.</description>
+      <category>linux</category>
+      <category>kernel</category>
+      <category>sysctl</category>
+    </item>
+    <item>
+      <title>Ajuste de parámetros sysctl para servidores de alto tráfico andas</title>
+      <link>https://migue-linux.com/p/100A-optimizacion-kernel1.html</link>
+      <guid isPermaLink="true">https://migue-linux.com/p/100A-optimizacion-kernel1.html</guid>
+      <pubDate>Mon, 28 Sep 2026 12:00:00 -0600</pubDate>
+      <description>Optimizando somaxconn y TCP reuse para evitar cuellos de botella.</description>
+      <category>linux</category>
+      <category>kernel</category>
+      <category>sysctl</category>
+    </item>
+  </channel>
+</rss>

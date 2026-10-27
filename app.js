@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const PROMPT_USER = "miguelguzman@Oaxaqueando";
   const DEFAULT_AUTHOR = "miguel-guzman";
   const DEFAULT_AVATAR = "assets/img/authors/default.avif";
+  const SITE_NAME = "MigueLinux";
   const POSTS_PER_PAGE = 5;
   const AUTHOR_RECENT_POSTS = 5;
   const NEW_POST_DAYS = 14; // Días que un post muestra la etiqueta NUEVO
@@ -31,10 +32,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // =========================================================================
   // 3. Estado
   // =========================================================================
+  // El post puede venir en la URL (?post=...) o en las páginas generadas por build.sh (p/<slug>.html)
   const params = new URLSearchParams(window.location.search);
   const route = {
     page: params.get("page"),
-    post: params.get("post"),
+    post: params.get("post") || document.body.dataset.post || null,
     author: params.get("author"),
   };
 
@@ -116,10 +118,19 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!header) paginationContainer.innerHTML = "";
   }
 
-  // Ruta que se muestra en la barra de la ventana y en la pestaña del navegador
+  // Ruta que se muestra en la barra de la ventana
   function setWindowPath(path) {
     if (windowPath) windowPath.textContent = path;
-    document.title = `MigueLinux@Oaxaqueando: ${path}`;
+  }
+
+  // Título de la pestaña (y el que ve Google al ejecutar el JS)
+  function setTitle(title) {
+    document.title = `${title} | ${SITE_NAME}`;
+  }
+
+  // URL de un post: página estática generada por build.sh (mejor para SEO y redes sociales)
+  function postURL(post) {
+    return `p/${encodeURIComponent(getPostSlug(post))}.html`;
   }
 
   // =========================================================================
@@ -151,7 +162,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Un post en los listados, con formato de `ls -l`
   function postCardHTML(post, { showAuthor }) {
     const fileName = post.file.split("/").pop();
-    const href = `?post=${encodeURIComponent(getPostSlug(post))}`;
+    const href = postURL(post);
 
     let authorHTML = "";
     if (showAuthor) {
@@ -227,7 +238,7 @@ document.addEventListener("DOMContentLoaded", () => {
       for (let n = 2; usedIds.has(id); n++) id = `${slugify(h.textContent)}-${n}`;
       usedIds.add(id);
       h.id = id;
-      return `<li class="toc-${h.tagName.toLowerCase()}"><a href="#${id}">${esc(h.textContent)}</a></li>`;
+      return `<li class="toc-${h.tagName.toLowerCase()}"><a href="${location.pathname}${location.search}#${id}">${esc(h.textContent)}</a></li>`;
     });
 
     const toc = document.createElement("nav");
@@ -299,6 +310,13 @@ document.addEventListener("DOMContentLoaded", () => {
       link.textContent = `~/${page.slug}`;
       pagesNav.appendChild(link);
     });
+
+    const rss = document.createElement("a");
+    rss.href = "feed.xml";
+    rss.textContent = "~/rss";
+    rss.title = "Suscríbete con tu lector RSS";
+    pagesNav.appendChild(rss);
+
     updateActiveNav();
   }
 
@@ -455,6 +473,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!res.ok) throw new Error("Markdown file not found");
       const mdContent = await res.text();
 
+      setTitle(pageInfo.titulo || slug);
       postsContainer.innerHTML = terminalHTML({
         path: `~/${slug}.md`,
         command: `cat ~/${slug}.md`,
@@ -487,6 +506,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (authorMatch) authorId = authorMatch[1].trim();
       }
 
+      setTitle(postInfo.titulo || slug);
       postsContainer.innerHTML = terminalHTML({
         path: `~/${postInfo.file}`,
         command: `cat ${postInfo.file}`,
@@ -564,6 +584,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="ls" id="author-posts-list"></div>
     `;
 
+    setTitle(name);
     postsContainer.innerHTML = terminalHTML({
       path: `~/users/${authorSlug}`,
       command: `finger ${authorSlug}`,
@@ -583,6 +604,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 404 con estilo terminal (post, autor o página inexistente)
   function renderNotFound(invalidResource) {
     setLayout({ footer: false });
+    setTitle("404");
 
     postsContainer.innerHTML = terminalHTML({
       path: "404",
@@ -607,7 +629,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // =========================================================================
   function trackPageView() {
     const pathname = window.location.pathname.replace(/^\/|\/$/g, "");
-    const trackingPage = route.page ? `page-${route.page}` : (pathname || "home");
+    const trackingPage = route.post
+      ? `post-${route.post}`
+      : route.page ? `page-${route.page}` : (pathname || "home");
 
     fetch(`/api/tracker.php?page=${encodeURIComponent(trackingPage)}`)
       .then((response) => response.json())
