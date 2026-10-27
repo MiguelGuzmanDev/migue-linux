@@ -18,7 +18,8 @@
     "slug": "112A-instalar-libvirt-virt-install-fedora-40",
     "file": "posts/instalar-libvirt-virt-install-fedora-40.md",
     "minutos": 6,
-    "author": "miguel-guzman"
+    "author": "miguel-guzman",
+    "imagen": "assets/img/posts/2026/10/0004-instalar-libvirt-virt-install-fedora-40.png"
   },
   {
     "id": "107A",
@@ -34,7 +35,8 @@
     "type": "post",
     "slug": "107A-optimizacion-kernel107A",
     "file": "posts/optimizacion-kernel107A.md",
-    "minutos": 1
+    "minutos": 1,
+    "imagen": "assets/img/photo_2026-09-28_14-05-32.jpg"
   },
   {
     "id": "106D",
@@ -50,7 +52,8 @@
     "type": "post",
     "slug": "106D-optimizacion-kernel106A",
     "file": "posts/optimizacion-kernel106A.md",
-    "minutos": 1
+    "minutos": 1,
+    "imagen": "assets/img/photo_2026-09-28_14-05-32.jpg"
   },
   {
     "id": "105A",
@@ -66,6 +69,7 @@
     "type": "post",
     "slug": "105A-optimizacion-kernel105A",
     "file": "posts/optimizacion-kernel105A.md",
-    "minutos": 1
+    "minutos": 1,
+    "imagen": "assets/img/photo_2026-09-28_14-05-32.jpg"
   }
 ]
