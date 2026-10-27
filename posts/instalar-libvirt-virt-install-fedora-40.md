@@ -11,6 +11,8 @@ author: miguel-guzman
 
 # Instalar libvirt y crear tu primera VM con virt-install en Fedora 40
 
+![Instalar libvirt y crear tu primera VM con virt-install en Fedora 40](/assets/img/post/2026/10/001A-instalar-libvirt-virt-install-fedora-40.png "Instalar libvirt y crear tu primera VM con virt-install en Fedora 40")
+
 Tener un laboratorio de máquinas virtuales en tu propia laptop es de lo más útil que puede hacer un SysAdmin: pruebas un cambio antes de llevarlo a producción, rompes cosas sin miedo y practicas con otras distribuciones.
 
 En Fedora todo lo necesario ya viene en los repositorios oficiales: **KVM** (el hipervisor del kernel), **QEMU** (el emulador que corre las VMs), **libvirt** (la capa que las administra) y **virt-install** (la herramienta para crearlas desde la terminal).

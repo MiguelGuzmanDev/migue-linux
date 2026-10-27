@@ -20,28 +20,13 @@
     <loc>https://migue-linux.com/?tag=fedora</loc>
   </url>
   <url>
-    <loc>https://migue-linux.com/?tag=kernel</loc>
-  </url>
-  <url>
     <loc>https://migue-linux.com/?tag=kvm</loc>
   </url>
   <url>
     <loc>https://migue-linux.com/?tag=libvirt</loc>
   </url>
   <url>
-    <loc>https://migue-linux.com/?tag=linux</loc>
-  </url>
-  <url>
-    <loc>https://migue-linux.com/?tag=otro</loc>
-  </url>
-  <url>
     <loc>https://migue-linux.com/?tag=qemu</loc>
-  </url>
-  <url>
-    <loc>https://migue-linux.com/?tag=sysctl</loc>
-  </url>
-  <url>
-    <loc>https://migue-linux.com/?tag=uttt</loc>
   </url>
   <url>
     <loc>https://migue-linux.com/?tag=virsh</loc>
@@ -55,49 +40,5 @@
   <url>
     <loc>https://migue-linux.com/p/112A-instalar-libvirt-virt-install-fedora-40.html</loc>
     <lastmod>2026-10-27</lastmod>
-  </url>
-  <url>
-    <loc>https://migue-linux.com/p/107A-optimizacion-kernel107A.html</loc>
-    <lastmod>2026-10-01</lastmod>
-  </url>
-  <url>
-    <loc>https://migue-linux.com/p/106D-optimizacion-kernel106A.html</loc>
-    <lastmod>2026-10-01</lastmod>
-  </url>
-  <url>
-    <loc>https://migue-linux.com/p/105A-optimizacion-kernel105A.html</loc>
-    <lastmod>2026-10-01</lastmod>
-  </url>
-  <url>
-    <loc>https://migue-linux.com/p/111A-optimizacion-kernel11.html</loc>
-    <lastmod>2026-09-28</lastmod>
-  </url>
-  <url>
-    <loc>https://migue-linux.com/p/110A-optimizacion-kernel10.html</loc>
-    <lastmod>2026-09-28</lastmod>
-  </url>
-  <url>
-    <loc>https://migue-linux.com/p/104B-optimizacion-kernel2.html</loc>
-    <lastmod>2026-09-28</lastmod>
-  </url>
-  <url>
-    <loc>https://migue-linux.com/p/103A-optimizacion-kernel3.html</loc>
-    <lastmod>2026-09-28</lastmod>
-  </url>
-  <url>
-    <loc>https://migue-linux.com/p/102C-optimizacion-kernel.html</loc>
-    <lastmod>2026-09-28</lastmod>
-  </url>
-  <url>
-    <loc>https://migue-linux.com/p/101K-optimizacion-kernel103c.html</loc>
-    <lastmod>2026-09-28</lastmod>
-  </url>
-  <url>
-    <loc>https://migue-linux.com/p/101C-optimizacion-kernel101c.html</loc>
-    <lastmod>2026-09-28</lastmod>
-  </url>
-  <url>
-    <loc>https://migue-linux.com/p/100A-optimizacion-kernel1.html</loc>
-    <lastmod>2026-09-28</lastmod>
   </url>
 </urlset>
