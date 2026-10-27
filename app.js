@@ -85,8 +85,12 @@ document.addEventListener("DOMContentLoaded", () => {
     return post.slug || post.file.split("/").pop().replace(/\.md$/, "");
   }
 
+  // Acepta el slug actual, el id o el formato viejo <id>-<archivo> (enlaces ya compartidos)
   function findPost(slug) {
-    return allPosts.find((p) => getPostSlug(p) === slug || p.id === slug);
+    return allPosts.find((p) => {
+      const legacy = `${p.id}-${p.file.split("/").pop().replace(/\.md$/, "")}`;
+      return getPostSlug(p) === slug || p.id === slug || legacy === slug;
+    });
   }
 
   function findAuthor(authorId) {

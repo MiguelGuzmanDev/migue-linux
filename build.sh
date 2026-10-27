@@ -127,6 +127,7 @@ known_tags = {t["slug"].lower() for t in load_json(f"{DATA_DIR}/tags.json", [])}
 # ---------------------------------------------------------------------------
 posts_by_month = {}
 seen_ids = {}
+seen_slugs = {}
 
 for filename in sorted(os.listdir(POSTS_DIR)):
     if not filename.endswith(".md"):
@@ -168,6 +169,14 @@ for filename in sorted(os.listdir(POSTS_DIR)):
         warn(f"{path}: el autor '{author}' no está en {DATA_DIR}/authors.json")
 
     stem = filename[:-3]
+    # URL del post: p/<slug>.html. El slug sale de `slug:` o del nombre del archivo.
+    # No lo cambies después de publicar: cambiaría la URL.
+    slug = re.sub(r"[^a-z0-9-]+", "-", str(fm.get("slug") or stem).strip().lower()).strip("-")
+    if slug in seen_slugs:
+        warn(f"[OMITIDO] {path}: el slug '{slug}' ya lo usa {seen_slugs[slug]}")
+        continue
+    seen_slugs[slug] = path
+
     entry = {
         "id": post_id,
         "titulo": fm.get("titulo", ""),
@@ -176,8 +185,7 @@ for filename in sorted(os.listdir(POSTS_DIR)):
         "extracto": fm.get("extracto", ""),
         "tags": fm.get("tags", []),
         "type": fm.get("type", "post"),
-        # La URL del post es ?post=<id>-<nombre-del-archivo>
-        "slug": f"{post_id}-{stem}",
+        "slug": slug,
         "file": path,
         "minutos": reading_minutes(content),
     }
@@ -299,7 +307,8 @@ for month, month_posts in posts_by_month.items():
         if "imagen" in post:
             continue
         # Mismo nombre que usarías a mano: <id>-<nombre-del-archivo>.png
-        card = f"{POST_IMAGES_DIR}/{year}/{mm}/{post['slug']}.png"
+        stem = os.path.basename(post["file"])[:-3]
+        card = f"{POST_IMAGES_DIR}/{year}/{mm}/{post['id']}-{stem}.png"
         if Image is None:
             continue
         generated_cards.add(card)
@@ -396,6 +405,7 @@ def render_post_page(post):
   <title>{e(title)}</title>
   <meta name="description" content="{e(post['extracto'])}">
   <meta name="author" content="{e(author_name)}">
+  <meta property="article:author" content="{e(author_name)}">
   <link rel="canonical" href="{e(url)}">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="{e(SITE_NAME)}">

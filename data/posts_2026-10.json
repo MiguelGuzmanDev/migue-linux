@@ -15,7 +15,7 @@
       "virtualizacion"
     ],
     "type": "post",
-    "slug": "001A-instalar-libvirt-virt-install-fedora-40",
+    "slug": "instalar-libvirt-virt-install-fedora-40",
     "file": "posts/instalar-libvirt-virt-install-fedora-40.md",
     "minutos": 6,
     "author": "miguel-guzman",
