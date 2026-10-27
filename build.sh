@@ -1,121 +1,163 @@
 #!/usr/bin/env bash
+#
+# Genera los índices JSON que lee app.js a partir de los posts en Markdown:
+#   data/posts_YYYY-MM.json  -> posts de cada mes (más reciente primero)
+#   data/months.json         -> lista de meses disponibles
+#
+# También revisa el contenido y avisa de problemas:
+#   - posts sin Front Matter, sin id, sin fecha o con id duplicado
+#   - categorías que no existen en data/categories.json
+#   - autores que no existen en data/authors.json
+#   - páginas de data/pages.json cuyo .md no existe
+#
+# Uso: ./build.sh
 
-# Configuración de directorios
-POSTS_DIR="posts"
-DATA_DIR="data"
+set -euo pipefail
+cd "$(dirname "$0")"
 
-# Asegurar que existe el directorio de datos
-mkdir -p "$DATA_DIR"
-
-# Limpiar archivos de años previos en data/ para reescribirlos limpios
-rm -f "$DATA_DIR"/posts_*.json
-rm -f "$DATA_DIR"/years.json
-
-echo "🚀 Iniciando compilación del índice de posts..."
+echo "🚀 Generando índice de posts..."
 
 python3 - << 'EOF'
-import os
 import json
+import os
 import re
+import sys
 
-posts_dir = "posts"
-data_dir = "data"
+POSTS_DIR = "posts"
+DATA_DIR = "data"
 
-if not os.path.exists(posts_dir):
-    print(f"❌ El directorio '{posts_dir}' no existe.")
-    exit(1)
+warnings = []
 
-# Diccionario para agrupar entradas por año: {"2026": [...], "2025": [...]}
-posts_by_year = {}
-seen_ids = set()
+def warn(msg):
+    warnings.append(msg)
+    print(f"⚠️  {msg}")
 
-for filename in os.listdir(posts_dir):
-    if filename.endswith(".md"):
-        filepath = os.path.join(posts_dir, filename)
-        
-        with open(filepath, 'r', encoding='utf-8') as f:
-            content = f.read()
+def load_json(path, fallback):
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        warn(f"No existe {path}")
+        return fallback
 
-        # Extraer Front Matter tipo YAML entre ---
-        match = re.match(r'^---\s*\n(.*?)\n---\s*\n', content, re.DOTALL)
-        if not match:
-            print(f"⚠️  [OMITIDO] '{filename}' no tiene un encabezado Front Matter válido.")
+def write_json(path, data):
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+        f.write("\n")
+
+def parse_front_matter(content):
+    """Devuelve el Front Matter (--- ... ---) como dict, o None si no hay."""
+    match = re.match(r"^---\s*\n(.*?)\n---\s*\n", content.replace("\r\n", "\n"), re.DOTALL)
+    if not match:
+        return None
+
+    data = {}
+    for line in match.group(1).splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or ":" not in line:
             continue
+        key, val = line.split(":", 1)
+        key, val = key.strip(), val.strip().strip('"').strip("'")
+        # Listas simples: tags: [linux, kernel] o ["linux", "kernel"]
+        if val.startswith("[") and val.endswith("]"):
+            data[key] = [i.strip().strip('"').strip("'") for i in val[1:-1].split(",") if i.strip()]
+        else:
+            data[key] = val
+    return data
 
-        front_matter = match.group(1)
-        data = {}
+if not os.path.isdir(POSTS_DIR):
+    print(f"❌ El directorio '{POSTS_DIR}' no existe.")
+    sys.exit(1)
 
-        # Parsear clave-valor simple
-        for line in front_matter.splitlines():
-            line = line.strip()
-            if not line or line.startswith('#'):
-                continue
-            if ':' in line:
-                key, val = line.split(':', 1)
-                key = key.strip()
-                val = val.strip().strip('"').strip("'")
-                
-                # Saneamiento especial para arrays simples como tags: [linux, kernel]
-                if val.startswith('[') and val.endswith(']'):
-                    items = val[1:-1].split(',')
-                    data[key] = [i.strip().strip('"').strip("'") for i in items if i.strip()]
-                else:
-                    data[key] = val
+categories = {c["nombre"].lower() for c in load_json(f"{DATA_DIR}/categories.json", [])}
+categories |= {c["slug"].lower() for c in load_json(f"{DATA_DIR}/categories.json", [])}
+authors = {a["id"] for a in load_json(f"{DATA_DIR}/authors.json", [])}
 
-        post_id = str(data.get('id', '')).strip()
-        raw_slug = str(data.get('slug', '')).strip()
-        fecha = str(data.get('fecha', '')).strip()
+# ---------------------------------------------------------------------------
+# 1. Leer posts
+# ---------------------------------------------------------------------------
+posts_by_month = {}
+seen_ids = {}
 
-        if not post_id:
-            print(f"⚠️  [OMITIDO] '{filename}' no tiene ID.")
-            continue
+for filename in sorted(os.listdir(POSTS_DIR)):
+    if not filename.endswith(".md"):
+        continue
 
-        if post_id in seen_ids:
-            print(f"⚠️  [DUPLICADO OMITIDO] ID '{post_id}' en '{filename}' ya fue procesado.")
-            continue
+    path = f"{POSTS_DIR}/{filename}"
+    with open(path, encoding="utf-8") as f:
+        fm = parse_front_matter(f.read())
 
-        seen_ids.add(post_id)
+    if fm is None:
+        warn(f"[OMITIDO] {path}: no tiene Front Matter (--- ... ---)")
+        continue
 
-        # Determinar el año del post
-        year = fecha.split('-')[0] if '-' in fecha else "sin_fecha"
+    post_id = str(fm.get("id", "")).strip()
+    fecha = str(fm.get("fecha", "")).strip()
 
-        # Formatear el slug como ID-slug (ejemplo: 10002A-optimizacion-kernel)
-        unique_slug = f"{post_id}-{raw_slug}" if raw_slug else f"post-{post_id}"
+    if not post_id:
+        warn(f"[OMITIDO] {path}: no tiene id")
+        continue
+    if post_id in seen_ids:
+        warn(f"[OMITIDO] {path}: el id '{post_id}' ya lo usa {seen_ids[post_id]}")
+        continue
+    if not re.match(r"^\d{4}-\d{2}-\d{2}$", fecha):
+        warn(f"[OMITIDO] {path}: fecha '{fecha}' inválida (usa AAAA-MM-DD)")
+        continue
+    seen_ids[post_id] = path
 
-        entry = {
-            "id": post_id,
-            "slug": unique_slug,  # <-- AQUÍ: antes decía raw_slug
-            "type": data.get('type', 'post'),
-            "titulo": data.get('titulo', ''),
-            "fecha": fecha,
-            "categoria": data.get('categoria', ''),
-            "tags": data.get('tags', []),
-            "extracto": data.get('extracto', ''),
-            "file": f"{posts_dir}/{filename}"
-        }
+    categoria = fm.get("categoria", "")
+    if categoria and categoria.lower() not in categories:
+        warn(f"{path}: la categoría '{categoria}' no está en {DATA_DIR}/categories.json")
 
-        if year not in posts_by_year:
-            posts_by_year[year] = []
-            
-        posts_by_year[year].append(entry)
+    author = fm.get("author") or fm.get("autor")
+    if author and author not in authors:
+        warn(f"{path}: el autor '{author}' no está en {DATA_DIR}/authors.json")
 
-# Escribir los JSON por año y ordenar por fecha descendente
-all_years = sorted(list(posts_by_year.keys()), reverse=True)
+    stem = filename[:-3]
+    entry = {
+        "id": post_id,
+        "titulo": fm.get("titulo", ""),
+        "fecha": fecha,
+        "categoria": categoria,
+        "extracto": fm.get("extracto", ""),
+        "tags": fm.get("tags", []),
+        "type": fm.get("type", "post"),
+        # La URL del post es ?post=<id>-<nombre-del-archivo>
+        "slug": f"{post_id}-{stem}",
+        "file": path,
+    }
+    if author:
+        entry["author"] = author
 
-for yr in all_years:
-    # Ordenar los posts dentro de cada año por fecha más reciente primero
-    posts_by_year[yr].sort(key=lambda x: x.get('fecha', ''), reverse=True)
-    
-    out_file = os.path.join(data_dir, f"posts_{yr}.json")
-    with open(out_file, 'w', encoding='utf-8') as f:
-        json.dump(posts_by_year[yr], f, ensure_ascii=False, indent=2)
-    print(f"✅ Generado: {out_file} ({len(posts_by_year[yr])} posts)")
+    posts_by_month.setdefault(fecha[:7], []).append(entry)
 
-# Guardar un archivo con la lista de años disponibles
-with open(os.path.join(data_dir, "years.json"), 'w', encoding='utf-8') as f:
-    json.dump(all_years, f, ensure_ascii=False, indent=2)
+# ---------------------------------------------------------------------------
+# 2. Escribir data/posts_YYYY-MM.json y data/months.json
+# ---------------------------------------------------------------------------
+for old in os.listdir(DATA_DIR):
+    if re.match(r"^posts_.*\.json$", old):
+        os.remove(f"{DATA_DIR}/{old}")
 
-print(f"✅ Generado: {data_dir}/years.json -> {all_years}")
+months = sorted(posts_by_month, reverse=True)
+for month in months:
+    posts = sorted(posts_by_month[month], key=lambda p: (p["fecha"], p["id"]), reverse=True)
+    write_json(f"{DATA_DIR}/posts_{month}.json", posts)
+    print(f"✅ {DATA_DIR}/posts_{month}.json ({len(posts)} posts)")
+
+write_json(f"{DATA_DIR}/months.json", months)
+print(f"✅ {DATA_DIR}/months.json -> {months}")
+
+# ---------------------------------------------------------------------------
+# 3. Revisar que las páginas estáticas existan
+# ---------------------------------------------------------------------------
+for page in load_json(f"{DATA_DIR}/pages.json", []):
+    if page.get("slug") == "blog":
+        continue  # ?page=blog muestra el listado de posts, no necesita .md
+    if not os.path.isfile(page.get("file", "")):
+        warn(f"La página '{page.get('slug')}' apunta a {page.get('file')}, que no existe (dará 404)")
+
+total = sum(len(p) for p in posts_by_month.values())
+print(f"\n📦 {total} posts en {len(months)} meses, {len(warnings)} aviso(s).")
 EOF
 
-echo "✨ Proceso de build completado con éxito."
+echo "✨ Build completado."
