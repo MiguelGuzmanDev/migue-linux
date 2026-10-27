@@ -117,7 +117,9 @@ if not os.path.isdir(POSTS_DIR):
 
 categories = {c["nombre"].lower() for c in load_json(f"{DATA_DIR}/categories.json", [])}
 categories |= {c["slug"].lower() for c in load_json(f"{DATA_DIR}/categories.json", [])}
-authors = {a["id"] for a in load_json(f"{DATA_DIR}/authors.json", [])}
+author_names = {a["id"]: a.get("name", a["id"]) for a in load_json(f"{DATA_DIR}/authors.json", [])}
+authors = set(author_names)
+DEFAULT_AUTHOR = "miguel-guzman"
 known_tags = {t["slug"].lower() for t in load_json(f"{DATA_DIR}/tags.json", [])}
 
 # ---------------------------------------------------------------------------
@@ -374,6 +376,7 @@ if "<!-- SEO:START" not in template or "<!-- CONTENT:START -->" not in template:
 def render_post_page(post):
     e = lambda v: html.escape(str(v), quote=True)
     title = f"{post['titulo']} | MigueLinux"
+    author_name = author_names.get(post.get("author") or DEFAULT_AUTHOR, "Miguel Angel Guzmán Pérez")
     image = absolute(post.get("imagen") or DEFAULT_IMAGE)
     url = post_url(post)
     json_ld = json.dumps({
@@ -385,13 +388,14 @@ def render_post_page(post):
         "image": image,
         "url": url,
         "keywords": ", ".join(post["tags"]),
-        "author": {"@type": "Person", "name": "Miguel Ángel Guzmán Pérez"},
+        "author": {"@type": "Person", "name": author_name},
     }, ensure_ascii=False).replace("</", "<\\/")
 
     seo = f"""<!-- SEO:START (generado por build.sh, no editar) -->
   <base href="../">
   <title>{e(title)}</title>
   <meta name="description" content="{e(post['extracto'])}">
+  <meta name="author" content="{e(author_name)}">
   <link rel="canonical" href="{e(url)}">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="{e(SITE_NAME)}">
