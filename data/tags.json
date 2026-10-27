@@ -1,5 +1,10 @@
 [
   {
+    "slug": "linux",
+    "nombre": "Linux",
+    "descripcion": "Administración y uso de sistemas GNU/Linux en servidores y escritorio."
+  },
+  {
     "slug": "kvm",
     "nombre": "KVM",
     "descripcion": "Virtualización nativa basada en el kernel de Linux."
@@ -33,6 +38,11 @@
     "slug": "virsh",
     "nombre": "virsh",
     "descripcion": "Herramienta de línea de comandos para la administración de libvirt."
+  },
+  {
+    "slug": "virt-install",
+    "nombre": "virt-install",
+    "descripcion": "Creación de máquinas virtuales desde la línea de comandos con libvirt."
   },
   {
     "slug": "bash",

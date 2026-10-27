@@ -13,6 +13,7 @@
 #   - posts sin Front Matter, sin id, sin fecha o con id duplicado
 #   - categorías que no existen en data/categories.json
 #   - autores que no existen en data/authors.json
+#   - tags que no están descritos en data/tags.json
 #   - páginas de data/pages.json cuyo .md no existe
 #
 # Uso: ./build.sh
@@ -93,6 +94,7 @@ if not os.path.isdir(POSTS_DIR):
 categories = {c["nombre"].lower() for c in load_json(f"{DATA_DIR}/categories.json", [])}
 categories |= {c["slug"].lower() for c in load_json(f"{DATA_DIR}/categories.json", [])}
 authors = {a["id"] for a in load_json(f"{DATA_DIR}/authors.json", [])}
+known_tags = {t["slug"].lower() for t in load_json(f"{DATA_DIR}/tags.json", [])}
 
 # ---------------------------------------------------------------------------
 # 1. Leer posts
@@ -130,6 +132,10 @@ for filename in sorted(os.listdir(POSTS_DIR)):
     categoria = fm.get("categoria", "")
     if categoria and categoria.lower() not in categories:
         warn(f"{path}: la categoría '{categoria}' no está en {DATA_DIR}/categories.json")
+
+    for tag in fm.get("tags", []):
+        if tag.lower() not in known_tags:
+            warn(f"{path}: el tag '{tag}' no está en {DATA_DIR}/tags.json (su página no tendrá descripción)")
 
     author = fm.get("author") or fm.get("autor")
     if author and author not in authors:
@@ -307,6 +313,9 @@ urls = [(f"{SITE_URL}/", all_posts[0]["fecha"] if all_posts else None)]
 for page in load_json(f"{DATA_DIR}/pages.json", []):
     if page.get("slug") != "blog" and os.path.isfile(page.get("file", "")):
         urls.append((f"{SITE_URL}/?page={page['slug']}", None))
+urls.append((f"{SITE_URL}/?tags", None))
+used_tags = sorted({t.lower() for p in all_posts for t in p["tags"]})
+urls += [(f"{SITE_URL}/?tag={t}", None) for t in used_tags]
 urls += [(post_url(p), p["fecha"]) for p in all_posts]
 
 entries = []

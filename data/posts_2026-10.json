@@ -1,5 +1,26 @@
 [
   {
+    "id": "112A",
+    "titulo": "Instalar libvirt y crear tu primera VM con virt-install en Fedora 40",
+    "fecha": "2026-10-27",
+    "categoria": "sysadmin",
+    "extracto": "Guía paso a paso para convertir tu Fedora 40 en un host KVM, configurar libvirt y crear máquinas virtuales desde la terminal con virt-install.",
+    "tags": [
+      "fedora",
+      "kvm",
+      "libvirt",
+      "qemu",
+      "virt-install",
+      "virsh",
+      "virtualizacion"
+    ],
+    "type": "post",
+    "slug": "112A-instalar-libvirt-virt-install-fedora-40",
+    "file": "posts/instalar-libvirt-virt-install-fedora-40.md",
+    "minutos": 6,
+    "author": "miguel-guzman"
+  },
+  {
     "id": "107A",
     "titulo": "Ajuste de parámetros sysctl para servidores de alto tráfico",
     "fecha": "2026-10-01",

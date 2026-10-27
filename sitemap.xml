@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://migue-linux.com/</loc>
-    <lastmod>2026-10-01</lastmod>
+    <lastmod>2026-10-27</lastmod>
   </url>
   <url>
     <loc>https://migue-linux.com/?page=home</loc>
@@ -12,6 +12,49 @@
   </url>
   <url>
     <loc>https://migue-linux.com/?page=contacto</loc>
+  </url>
+  <url>
+    <loc>https://migue-linux.com/?tags</loc>
+  </url>
+  <url>
+    <loc>https://migue-linux.com/?tag=fedora</loc>
+  </url>
+  <url>
+    <loc>https://migue-linux.com/?tag=kernel</loc>
+  </url>
+  <url>
+    <loc>https://migue-linux.com/?tag=kvm</loc>
+  </url>
+  <url>
+    <loc>https://migue-linux.com/?tag=libvirt</loc>
+  </url>
+  <url>
+    <loc>https://migue-linux.com/?tag=linux</loc>
+  </url>
+  <url>
+    <loc>https://migue-linux.com/?tag=otro</loc>
+  </url>
+  <url>
+    <loc>https://migue-linux.com/?tag=qemu</loc>
+  </url>
+  <url>
+    <loc>https://migue-linux.com/?tag=sysctl</loc>
+  </url>
+  <url>
+    <loc>https://migue-linux.com/?tag=uttt</loc>
+  </url>
+  <url>
+    <loc>https://migue-linux.com/?tag=virsh</loc>
+  </url>
+  <url>
+    <loc>https://migue-linux.com/?tag=virt-install</loc>
+  </url>
+  <url>
+    <loc>https://migue-linux.com/?tag=virtualizacion</loc>
+  </url>
+  <url>
+    <loc>https://migue-linux.com/p/112A-instalar-libvirt-virt-install-fedora-40.html</loc>
+    <lastmod>2026-10-27</lastmod>
   </url>
   <url>
     <loc>https://migue-linux.com/p/107A-optimizacion-kernel107A.html</loc>

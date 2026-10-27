@@ -398,6 +398,83 @@ a:hover {
   color: var(--amber);
 }
 
+a.tag:hover {
+  color: var(--yellow);
+}
+
+/* Página de un tag */
+.tag-info {
+  padding: 18px 20px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--amber);
+  border-radius: 12px;
+}
+
+.tag-info-name {
+  color: var(--amber);
+  font-size: clamp(26px, 6vw, 36px);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.tag-info-desc {
+  margin: 6px 0 8px;
+  color: var(--text-soft);
+  font-family: var(--font-sans);
+}
+
+.tag-info-count {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* Índice de tags */
+.tags-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.tag-tile {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 8px;
+  padding: 12px 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: inherit;
+  transition: border-color 0.15s;
+}
+
+.tag-tile:hover {
+  border-color: var(--amber);
+  text-decoration: none;
+}
+
+.tag-tile.is-empty {
+  opacity: 0.55;
+}
+
+.tag-tile-name {
+  color: var(--amber);
+  font-weight: 600;
+}
+
+.tag-tile-count {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.tag-tile-desc {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
 .reading-time::before {
   content: "⏱ ";
 }

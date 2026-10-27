@@ -38,11 +38,14 @@ document.addEventListener("DOMContentLoaded", () => {
     page: params.get("page"),
     post: params.get("post") || document.body.dataset.post || null,
     author: params.get("author"),
+    tag: params.get("tag"),
+    tags: params.has("tags"),
   };
 
   let allPosts = [];
   let allAuthors = [];
   let allPages = [];
+  let allTags = [];
   let currentFilteredPosts = [];
   let currentCategory = null;
   let currentQuery = "";
@@ -153,10 +156,15 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
+  // Cada tag es un enlace a su página (?tag=kvm)
   function tagsHTML(tags) {
     return tags && tags.length > 0
-      ? `<span class="post-tags">${tags.map((t) => `<span class="tag">#${esc(t)}</span>`).join(" ")}</span>`
+      ? `<span class="post-tags">${tags.map((t) => `<a class="tag" href="?tag=${encodeURIComponent(slugify(t))}">#${esc(t)}</a>`).join(" ")}</span>`
       : "";
+  }
+
+  function postsWithTag(tagSlug) {
+    return allPosts.filter((post) => (post.tags || []).some((t) => slugify(t) === tagSlug));
   }
 
   // Un post en los listados, con formato de `ls -l`
@@ -311,6 +319,11 @@ document.addEventListener("DOMContentLoaded", () => {
       pagesNav.appendChild(link);
     });
 
+    const tagsLink = document.createElement("a");
+    tagsLink.href = "?tags";
+    tagsLink.textContent = "~/tags";
+    pagesNav.appendChild(tagsLink);
+
     const rss = document.createElement("a");
     rss.href = "feed.xml";
     rss.textContent = "~/rss";
@@ -322,13 +335,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Resalta la página o sección activa en #pages-nav
   function updateActiveNav() {
-    const inBlog = !route.page || route.post || route.author;
+    const inTags = route.tag || route.tags;
+    const inBlog = !inTags && (!route.page || route.post || route.author);
 
     pagesNav.querySelectorAll("a").forEach((link) => {
       const href = link.getAttribute("href");
-      const active = inBlog
-        ? href === "./" || href.includes("page=blog")
-        : href.includes(`page=${encodeURIComponent(route.page)}`);
+      let active;
+      if (inTags) active = href === "?tags";
+      else if (inBlog) active = href === "./" || href.includes("page=blog");
+      else active = href.includes(`page=${encodeURIComponent(route.page)}`);
       link.classList.toggle("active", active);
     });
   }
@@ -601,6 +616,73 @@ document.addEventListener("DOMContentLoaded", () => {
     appendPostCards(postsList, recentPosts, { showAuthor: false });
   }
 
+  // Página de un tag (?tag=kvm): su descripción y sus posts
+  function renderTagPage(tagSlug) {
+    setLayout();
+
+    const slug = slugify(tagSlug);
+    const tagInfo = allTags.find((t) => slugify(t.slug) === slug);
+    const posts = postsWithTag(slug);
+    if (!tagInfo && posts.length === 0) return renderNotFound(`tags/${tagSlug}`);
+
+    const name = tagInfo ? tagInfo.nombre : slug;
+    const description = tagInfo ? tagInfo.descripcion : "Sin descripción todavía.";
+
+    setTitle(`#${name}`);
+    postsContainer.innerHTML = terminalHTML({
+      path: `~/tags/${slug}`,
+      command: `cat ~/tags/${slug}.txt`,
+      body: `
+        <div class="tag-info">
+          <div class="tag-info-name">#${esc(name)}</div>
+          <p class="tag-info-desc">${esc(description)}</p>
+          <span class="tag-info-count">${posts.length} ${posts.length === 1 ? "post" : "posts"}</span>
+        </div>
+        ${promptLineHTML(`ls -lt ~/posts --tag=${slug}`)}
+        <div class="ls" id="tag-posts-list"></div>
+      `,
+    });
+
+    const list = document.getElementById("tag-posts-list");
+    if (posts.length === 0) {
+      list.innerHTML = "<p class='no-posts'>Todavía no hay publicaciones con este tag.</p>";
+      return;
+    }
+    appendPostCards(list, posts, { showAuthor: true });
+  }
+
+  // Índice de tags (?tags): todos los tags con su número de posts
+  function renderTagsIndex() {
+    setLayout();
+    setTitle("Tags");
+
+    // Tags de tags.json + los que usan los posts aunque no estén descritos
+    const known = new Map(allTags.map((t) => [slugify(t.slug), t]));
+    allPosts.forEach((p) => (p.tags || []).forEach((t) => {
+      if (!known.has(slugify(t))) known.set(slugify(t), { slug: slugify(t), nombre: t, descripcion: "" });
+    }));
+
+    const tags = [...known.entries()]
+      .map(([slug, t]) => ({ slug, nombre: t.nombre, descripcion: t.descripcion, count: postsWithTag(slug).length }))
+      .sort((a, b) => b.count - a.count || a.nombre.localeCompare(b.nombre));
+
+    postsContainer.innerHTML = terminalHTML({
+      path: "~/tags",
+      command: "ls -l ~/tags",
+      body: `
+        <div class="tags-grid">
+          ${tags.map((t) => `
+            <a class="tag-tile${t.count === 0 ? " is-empty" : ""}" href="?tag=${encodeURIComponent(t.slug)}">
+              <span class="tag-tile-name">#${esc(t.nombre)}</span>
+              <span class="tag-tile-count">${t.count}</span>
+              ${t.descripcion ? `<span class="tag-tile-desc">${esc(t.descripcion)}</span>` : ""}
+            </a>
+          `).join("")}
+        </div>
+      `,
+    });
+  }
+
   // 404 con estilo terminal (post, autor o página inexistente)
   function renderNotFound(invalidResource) {
     setLayout({ footer: false });
@@ -631,6 +713,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const pathname = window.location.pathname.replace(/^\/|\/$/g, "");
     const trackingPage = route.post
       ? `post-${route.post}`
+      : route.tag ? `tag-${route.tag}`
       : route.page ? `page-${route.page}` : (pathname || "home");
 
     fetch(`/api/tracker.php?page=${encodeURIComponent(trackingPage)}`)
@@ -658,6 +741,8 @@ document.addEventListener("DOMContentLoaded", () => {
   function router() {
     if (route.post) return renderSinglePost(route.post);
     if (route.author) return renderAuthorPage(route.author);
+    if (route.tag) return renderTagPage(route.tag);
+    if (route.tags) return renderTagsIndex();
     if (route.page && route.page !== "blog") return renderStaticPage(route.page);
     // Raíz o ?page=blog -> listado de posts
     return renderPosts(currentFilteredPosts);
@@ -673,15 +758,17 @@ document.addEventListener("DOMContentLoaded", () => {
       Promise.all(months.map((month) => loadJSON(`data/posts_${month}.json`)))
     );
 
-    const [authors, pages, categories, postsByMonth] = await Promise.all([
+    const [authors, pages, categories, tags, postsByMonth] = await Promise.all([
       loadJSON("data/authors.json"),
       loadJSON("data/pages.json"),
       loadJSON("data/categories.json"),
+      loadJSON("data/tags.json"),
       postsPromise,
     ]);
 
     allAuthors = authors;
     allPages = pages;
+    allTags = tags;
     allPosts = postsByMonth.flat();
     currentFilteredPosts = allPosts;
 
