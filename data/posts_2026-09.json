@@ -14,7 +14,8 @@
     ],
     "type": "post",
     "slug": "111A-optimizacion-kernel11",
-    "file": "posts/optimizacion-kernel11.md"
+    "file": "posts/optimizacion-kernel11.md",
+    "minutos": 1
   },
   {
     "id": "110A",
@@ -31,7 +32,8 @@
     ],
     "type": "post",
     "slug": "110A-optimizacion-kernel10",
-    "file": "posts/optimizacion-kernel10.md"
+    "file": "posts/optimizacion-kernel10.md",
+    "minutos": 1
   },
   {
     "id": "104B",
@@ -46,7 +48,8 @@
     ],
     "type": "post",
     "slug": "104B-optimizacion-kernel2",
-    "file": "posts/optimizacion-kernel2.md"
+    "file": "posts/optimizacion-kernel2.md",
+    "minutos": 1
   },
   {
     "id": "103A",
@@ -61,7 +64,8 @@
     ],
     "type": "post",
     "slug": "103A-optimizacion-kernel3",
-    "file": "posts/optimizacion-kernel3.md"
+    "file": "posts/optimizacion-kernel3.md",
+    "minutos": 1
   },
   {
     "id": "102C",
@@ -77,6 +81,7 @@
     "type": "post",
     "slug": "102C-optimizacion-kernel",
     "file": "posts/optimizacion-kernel.md",
+    "minutos": 1,
     "author": "miguel-guzman"
   },
   {
@@ -92,7 +97,8 @@
     ],
     "type": "post",
     "slug": "101K-optimizacion-kernel103c",
-    "file": "posts/optimizacion-kernel103c.md"
+    "file": "posts/optimizacion-kernel103c.md",
+    "minutos": 1
   },
   {
     "id": "101C",
@@ -107,7 +113,8 @@
     ],
     "type": "post",
     "slug": "101C-optimizacion-kernel101c",
-    "file": "posts/optimizacion-kernel101c.md"
+    "file": "posts/optimizacion-kernel101c.md",
+    "minutos": 1
   },
   {
     "id": "100A",
@@ -122,6 +129,7 @@
     ],
     "type": "post",
     "slug": "100A-optimizacion-kernel1",
-    "file": "posts/optimizacion-kernel1.md"
+    "file": "posts/optimizacion-kernel1.md",
+    "minutos": 1
   }
 ]

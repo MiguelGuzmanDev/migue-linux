@@ -25,6 +25,7 @@ import sys
 
 POSTS_DIR = "posts"
 DATA_DIR = "data"
+WORDS_PER_MINUTE = 200  # Igual que en app.js
 
 warnings = []
 
@@ -65,6 +66,10 @@ def parse_front_matter(content):
             data[key] = val
     return data
 
+def reading_minutes(content):
+    body = re.sub(r"^---\s*\n.*?\n---\s*\n", "", content.replace("\r\n", "\n"), count=1, flags=re.DOTALL)
+    return max(1, round(len(body.split()) / WORDS_PER_MINUTE))
+
 if not os.path.isdir(POSTS_DIR):
     print(f"❌ El directorio '{POSTS_DIR}' no existe.")
     sys.exit(1)
@@ -85,7 +90,8 @@ for filename in sorted(os.listdir(POSTS_DIR)):
 
     path = f"{POSTS_DIR}/{filename}"
     with open(path, encoding="utf-8") as f:
-        fm = parse_front_matter(f.read())
+        content = f.read()
+    fm = parse_front_matter(content)
 
     if fm is None:
         warn(f"[OMITIDO] {path}: no tiene Front Matter (--- ... ---)")
@@ -125,6 +131,7 @@ for filename in sorted(os.listdir(POSTS_DIR)):
         # La URL del post es ?post=<id>-<nombre-del-archivo>
         "slug": f"{post_id}-{stem}",
         "file": path,
+        "minutos": reading_minutes(content),
     }
     if author:
         entry["author"] = author

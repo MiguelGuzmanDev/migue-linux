@@ -253,6 +253,50 @@ a:hover {
   font-weight: 700;
 }
 
+/* Buscador: grep -ri "texto" ~/posts */
+.search-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  margin-top: 20px;
+}
+
+.search-line label {
+  white-space: pre;
+  cursor: text;
+}
+
+#search-input {
+  min-width: 7ch;
+  max-width: 100%;
+  padding: 0 2px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px dashed var(--muted);
+  color: var(--amber);
+  font: inherit;
+  caret-color: var(--green);
+  outline: none;
+}
+
+#search-input::placeholder {
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+#search-input:focus {
+  border-bottom-color: var(--green);
+}
+
+/* Oculta la "x" nativa del input de búsqueda */
+#search-input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.search-suffix {
+  white-space: pre;
+}
+
 /* --------------------------------------------------------------------------
    6. Listado de posts (formato `ls -l`)
    -------------------------------------------------------------------------- */
@@ -352,6 +396,10 @@ a:hover {
 
 .tag {
   color: var(--amber);
+}
+
+.reading-time::before {
+  content: "⏱ ";
 }
 
 .post-author .author-link {
@@ -534,6 +582,51 @@ a:hover {
 .static-page-content blockquote strong,
 .callout b {
   color: var(--text);
+}
+
+/* Índice del post */
+.toc {
+  margin: 0 0 28px;
+  padding: 14px 18px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+}
+
+.toc-title {
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.toc ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.toc li {
+  margin: 4px 0;
+}
+
+.toc li::before {
+  content: "## ";
+  color: var(--muted);
+}
+
+.toc .toc-h3 {
+  padding-left: 18px;
+}
+
+.toc .toc-h3::before {
+  content: "### ";
+}
+
+.static-page-content h2,
+.static-page-content h3 {
+  scroll-margin-top: 16px;
 }
 
 /* --------------------------------------------------------------------------

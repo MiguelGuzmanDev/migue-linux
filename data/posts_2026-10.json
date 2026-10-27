@@ -12,7 +12,8 @@
     ],
     "type": "post",
     "slug": "107A-optimizacion-kernel107A",
-    "file": "posts/optimizacion-kernel107A.md"
+    "file": "posts/optimizacion-kernel107A.md",
+    "minutos": 1
   },
   {
     "id": "106D",
@@ -27,7 +28,8 @@
     ],
     "type": "post",
     "slug": "106D-optimizacion-kernel106A",
-    "file": "posts/optimizacion-kernel106A.md"
+    "file": "posts/optimizacion-kernel106A.md",
+    "minutos": 1
   },
   {
     "id": "105A",
@@ -42,6 +44,7 @@
     ],
     "type": "post",
     "slug": "105A-optimizacion-kernel105A",
-    "file": "posts/optimizacion-kernel105A.md"
+    "file": "posts/optimizacion-kernel105A.md",
+    "minutos": 1
   }
 ]

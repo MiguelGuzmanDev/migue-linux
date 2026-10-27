@@ -4,10 +4,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // =========================================================================
   const PROMPT_USER = "miguelguzman@Oaxaqueando";
   const DEFAULT_AUTHOR = "miguel-guzman";
-  const DEFAULT_AVATAR = "https://migue-linux.com/assets/img/authors/default.avif";
+  const DEFAULT_AVATAR = "assets/img/authors/default.avif";
   const POSTS_PER_PAGE = 5;
   const AUTHOR_RECENT_POSTS = 5;
   const NEW_POST_DAYS = 14; // Días que un post muestra la etiqueta NUEVO
+  const WORDS_PER_MINUTE = 200; // Para calcular el tiempo de lectura
+  const TOC_MIN_HEADINGS = 3; // Mínimo de subtítulos para mostrar el índice
 
   // =========================================================================
   // 2. Elementos del DOM
@@ -18,6 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const postsContainer = document.getElementById("posts-container");
   const cliFooter = document.querySelector(".cli-footer");
   const windowPath = document.getElementById("window-path");
+  const searchInput = document.getElementById("search-input");
 
   // Contenedor dinámico de paginación
   const paginationContainer = document.createElement("div");
@@ -40,6 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let allPages = [];
   let currentFilteredPosts = [];
   let currentCategory = null;
+  let currentQuery = "";
   let currentPage = 1;
 
   // =========================================================================
@@ -82,6 +86,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function findAuthor(authorId) {
     return allAuthors.find((a) => a.id === authorId);
+  }
+
+  // Minúsculas y sin acentos, para que "configuracion" encuentre "configuración"
+  function normalize(text) {
+    return String(text ?? "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
+
+  function readingMinutes(mdContent) {
+    const words = mdContent.replace(/^---[\s\S]*?---\s*/, "").split(/\s+/).filter(Boolean).length;
+    return Math.max(1, Math.round(words / WORDS_PER_MINUTE));
+  }
+
+  // Convierte un título en un id para enlazarlo desde el índice: "¿Por qué?" -> "por-que"
+  function slugify(text) {
+    return normalize(text).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "seccion";
   }
 
   function isNewPost(post) {
@@ -153,6 +172,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <p class="post-extract">${esc(post.extracto)}</p>
       <div class="post-meta">
         ${tagsHTML(post.tags)}
+        ${post.minutos ? `<span class="reading-time">${esc(post.minutos)} min</span>` : ""}
         ${authorHTML}
       </div>
     `;
@@ -194,6 +214,34 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       </div>
     `;
+  }
+
+  // Índice clicable con los subtítulos (##, ###) de un post largo
+  function addTableOfContents(content) {
+    const headings = [...content.querySelectorAll("h2, h3")];
+    if (headings.length < TOC_MIN_HEADINGS) return;
+
+    const usedIds = new Set();
+    const items = headings.map((h) => {
+      let id = slugify(h.textContent);
+      for (let n = 2; usedIds.has(id); n++) id = `${slugify(h.textContent)}-${n}`;
+      usedIds.add(id);
+      h.id = id;
+      return `<li class="toc-${h.tagName.toLowerCase()}"><a href="#${id}">${esc(h.textContent)}</a></li>`;
+    });
+
+    const toc = document.createElement("nav");
+    toc.className = "toc";
+    toc.setAttribute("aria-label", "Índice");
+    toc.innerHTML = `
+      <div class="toc-title">$ grep "^##" ${esc(windowPath ? windowPath.textContent.split("/").pop() : "post.md")}</div>
+      <ol>${items.join("")}</ol>
+    `;
+
+    // Va después del título principal del post, si lo tiene
+    const firstH1 = content.querySelector("h1");
+    if (firstH1) firstH1.after(toc);
+    else content.prepend(toc);
   }
 
   // Convierte cada <pre><code> en una caja con encabezado, resaltado y botón copiar
@@ -287,14 +335,46 @@ document.addEventListener("DOMContentLoaded", () => {
   function filterByCategory(categoryName, targetBtn) {
     document.querySelectorAll(".category-btn").forEach((btn) => btn.classList.remove("active"));
     targetBtn.classList.add("active");
-
     currentCategory = categoryName;
-    currentFilteredPosts = categoryName
-      ? allPosts.filter((post) => post.categoria && post.categoria.toLowerCase() === categoryName.toLowerCase())
-      : allPosts;
+    applyFilters();
+  }
+
+  // Aplica la categoría y la búsqueda juntas
+  function applyFilters() {
+    const query = normalize(currentQuery.trim());
+
+    currentFilteredPosts = allPosts.filter((post) => {
+      if (currentCategory && normalize(post.categoria) !== normalize(currentCategory)) return false;
+      if (!query) return true;
+      const haystack = normalize([post.titulo, post.extracto, post.categoria, post.file, ...(post.tags || [])].join(" "));
+      return haystack.includes(query);
+    });
 
     currentPage = 1;
     renderPosts(currentFilteredPosts);
+  }
+
+  // Buscador con forma de comando: grep -ri "texto" ~/posts
+  function setupSearch() {
+    if (!searchInput) return;
+
+    const resize = () => {
+      searchInput.style.width = `calc(${Math.max(searchInput.value.length, searchInput.placeholder.length)}ch + 6px)`;
+    };
+    resize();
+
+    searchInput.addEventListener("input", () => {
+      resize();
+      currentQuery = searchInput.value;
+      applyFilters();
+    });
+
+    searchInput.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && searchInput.value) {
+        searchInput.value = "";
+        searchInput.dispatchEvent(new Event("input"));
+      }
+    });
   }
 
   // =========================================================================
@@ -305,15 +385,18 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderPosts(posts) {
     setLayout({ header: true });
 
-    const command = currentCategory
-      ? `ls -lt ~/posts | grep ${currentCategory.toLowerCase()}`
-      : "ls -lt ~/posts";
+    const query = currentQuery.trim();
+    let command = query ? `grep -ril "${query}" ~/posts` : "ls -lt ~/posts";
+    if (currentCategory) command += ` | grep ${currentCategory.toLowerCase()}`;
 
     if (posts.length === 0) {
+      const message = query
+        ? `grep: no hay coincidencias para "${esc(query)}"`
+        : "No hay publicaciones en esta categoría.";
       postsContainer.innerHTML = terminalHTML({
         path: "~/posts",
         command,
-        body: "<p class='no-posts'>No hay publicaciones en esta categoría.</p>",
+        body: `<p class='no-posts'>${message}</p>`,
       });
       paginationContainer.innerHTML = "";
       return;
@@ -411,6 +494,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="post-meta post-meta-single">
             ${tagsHTML(postInfo.tags)}
             <span class="post-date">${esc(postInfo.fecha)}</span>
+            <span class="reading-time">${readingMinutes(mdContent)} min de lectura</span>
           </div>
           <div class="static-page-content">
             ${renderMarkdown(mdContent)}
@@ -418,6 +502,7 @@ document.addEventListener("DOMContentLoaded", () => {
           ${authorCardHTML(authorId || DEFAULT_AUTHOR)}
         `,
       });
+      addTableOfContents(postsContainer.querySelector(".static-page-content"));
       enhanceCodeBlocks(postsContainer);
     } catch (err) {
       console.warn(`Error al cargar el post (${slug}):`, err);
@@ -578,6 +663,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     renderPagesNav();
     renderCategories(categories);
+    setupSearch();
 
     if (allPosts.length === 0 && !route.page) {
       postsContainer.innerHTML = "<p>No hay publicaciones disponibles.</p>";
