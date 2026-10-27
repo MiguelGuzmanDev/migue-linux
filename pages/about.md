@@ -6,7 +6,6 @@ miguelguzman@migue-linux:~$ fastfetch --profile
        /\_/\         USER      : Miguel Ángel Guzmán Pérez
       ( o.o )        ROLE      : Senior Linux Systems Engineer | SysOps / SRE
        > ^ <         LOCATION  : CDMX / Oaxaca, México
-                     PHONE     : (953) 123 96 83
                      EMAIL     : miguel020909@gmail.com
                      GITHUB    : [https://github.com/MiguelGuzmanDev](https://github.com/MiguelGuzmanDev)
                      LINKEDIN  : [https://linkedin.com/in/mguzmanp](https://linkedin.com/in/mguzmanp)
