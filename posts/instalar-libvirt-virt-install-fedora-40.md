@@ -1,5 +1,5 @@
 ---
-id: 112A
+id: 001A
 slug: instalar-libvirt-virt-install-fedora-40
 titulo: Instalar libvirt y crear tu primera VM con virt-install en Fedora 40
 fecha: 2026-10-27

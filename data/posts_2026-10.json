@@ -1,6 +1,6 @@
 [
   {
-    "id": "112A",
+    "id": "001A",
     "titulo": "Instalar libvirt y crear tu primera VM con virt-install en Fedora 40",
     "fecha": "2026-10-27",
     "categoria": "sysadmin",
@@ -15,7 +15,7 @@
       "virtualizacion"
     ],
     "type": "post",
-    "slug": "112A-instalar-libvirt-virt-install-fedora-40",
+    "slug": "001A-instalar-libvirt-virt-install-fedora-40",
     "file": "posts/instalar-libvirt-virt-install-fedora-40.md",
     "minutos": 6,
     "author": "miguel-guzman"
