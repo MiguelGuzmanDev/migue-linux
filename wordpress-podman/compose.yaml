@@ -1,6 +1,7 @@
 # WordPress (PHP-FPM) + Nginx + MariaDB con podman-compose (Debian 13, Podman sin root)
 # Uso:
 #   cp .env.example .env      # y cambia las contraseñas
+#   podman-compose build      # construye wp-app y wp-nginx desde sus Dockerfile
 #   podman-compose up -d
 #   Abre http://IP-DE-LA-VM:8080
 
@@ -28,8 +29,9 @@ services:
     # Sin "ports": la base de datos solo es accesible desde la red interna del compose
 
   wordpress:
-    # Variante FPM: solo PHP, sin Apache; Nginx atiende las peticiones HTTP
-    image: docker.io/library/wordpress:6.8-php8.3-fpm
+    # Variante FPM (solo PHP, sin Apache) con límites de subida ajustados
+    build: ./wordpress
+    image: localhost/wp-app:1.0
     container_name: wp-app
     restart: unless-stopped
     depends_on:
@@ -45,7 +47,9 @@ services:
     # Sin "ports": PHP-FPM (puerto 9000) solo lo usa Nginx
 
   nginx:
-    image: docker.io/library/nginx:1.28-alpine
+    # Nginx con la configuración de WordPress incluida en la imagen
+    build: ./nginx
+    image: localhost/wp-nginx:1.0
     container_name: wp-nginx
     restart: unless-stopped
     depends_on:
@@ -56,7 +60,6 @@ services:
     volumes:
       # Mismos archivos de WordPress, en solo lectura, para servir los estáticos
       - wp_data:/var/www/html:ro
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
 
 volumes:
   db_data:
