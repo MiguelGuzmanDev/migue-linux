@@ -1,0 +1,50 @@
+# WordPress + MariaDB con podman-compose (Debian 13, Podman sin root)
+# Uso:
+#   cp .env.example .env      # y cambia las contraseñas
+#   podman-compose up -d
+#   Abre http://IP-DE-LA-VM:8080
+
+name: wordpress
+
+services:
+  db:
+    # Nombre completo de la imagen: Podman no asume docker.io por defecto
+    image: docker.io/library/mariadb:11.4
+    container_name: wp-db
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    # Sin "ports": la base de datos solo es accesible desde la red interna del compose
+
+  wordpress:
+    image: docker.io/library/wordpress:6.8-php8.3-apache
+    container_name: wp-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: ${DB_NAME}
+      WORDPRESS_DB_USER: ${DB_USER}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
+    ports:
+      # Podman sin root no puede abrir puertos < 1024; por eso 8080 en el host
+      - "8080:80"
+    volumes:
+      - wp_data:/var/www/html
+
+volumes:
+  db_data:
+  wp_data:
