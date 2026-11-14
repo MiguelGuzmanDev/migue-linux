@@ -762,6 +762,40 @@ a.tag:hover {
   line-height: 1.7;
 }
 
+/* Comandos de shell: las líneas largas se ajustan en vez de hacer scroll */
+.code-block.wrap pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Si un bloque necesita scroll (tablas, ASCII art), la barra es delgada y del tema */
+.code-block pre,
+.static-page-content pre {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.code-block pre::-webkit-scrollbar,
+.static-page-content pre::-webkit-scrollbar {
+  height: 6px;
+}
+
+.code-block pre::-webkit-scrollbar-track,
+.static-page-content pre::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.code-block pre::-webkit-scrollbar-thumb,
+.static-page-content pre::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.code-block pre::-webkit-scrollbar-thumb:hover,
+.static-page-content pre::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
 .code-block code,
 .static-page-content pre code {
   background: none;

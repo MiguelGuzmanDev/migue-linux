@@ -1,6 +1,6 @@
 ![Miguel Ángel Guzmán Pérez - Profile Photo](../assets/img/pages/miguel-guzman.jpeg)
 
-```bash
+```text
 miguelguzman@migue-linux:~$ fastfetch --profile
 
        /\_/\         USER      : Miguel Ángel Guzmán Pérez

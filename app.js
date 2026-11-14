@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const NEW_POST_DAYS = 14; // Días que un post muestra la etiqueta NUEVO
   const WORDS_PER_MINUTE = 200; // Para calcular el tiempo de lectura
   const TOC_MIN_HEADINGS = 3; // Mínimo de subtítulos para mostrar el índice
+  const SHELL_LANGS = /^(bash|sh|shell|zsh|console)$/;
 
   // =========================================================================
   // 2. Elementos del DOM
@@ -278,8 +279,11 @@ document.addEventListener("DOMContentLoaded", () => {
         hljs.highlightElement(code);
       }
 
+      // Los comandos largos se ajustan a varias líneas en vez de mostrar scroll horizontal;
+      // los bloques de texto (tablas, ASCII art) conservan su formato.
+      const isShell = SHELL_LANGS.test(lang);
       const block = document.createElement("div");
-      block.className = "code-block";
+      block.className = isShell ? "code-block wrap" : "code-block";
       block.innerHTML = `
         <div class="code-head">
           <span class="led"></span>
@@ -293,7 +297,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const copyBtn = block.querySelector(".copy-btn");
       copyBtn.addEventListener("click", async () => {
         // En bloques de shell no copiamos el "$ " del prompt
-        const text = /^(bash|sh|shell|zsh|console)$/.test(lang)
+        const text = isShell
           ? code.innerText.replace(/^\$ /gm, "")
           : code.innerText;
         try {
