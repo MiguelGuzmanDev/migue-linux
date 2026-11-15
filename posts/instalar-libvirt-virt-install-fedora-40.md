@@ -11,7 +11,7 @@ author: miguel-guzman
 
 # Instalar libvirt y crear tu primera VM con virt-install en Fedora 40
 
-![Instalar libvirt y crear tu primera VM con virt-install en Fedora 40](/assets/img/post/2026/10/001A-instalar-libvirt-virt-install-fedora-40.jpg "Instalar libvirt y crear tu primera VM con virt-install en Fedora 40")
+![Instalar libvirt y crear tu primera VM con virt-install en Fedora 40](/assets/img/post/2026/10/001A-instalar-libvirt-virt-install-fedora-40-1.jpg "Instalar libvirt y crear tu primera VM con virt-install en Fedora 40")
 
 Tener un laboratorio de máquinas virtuales en tu propia laptop es de lo más útil que puede hacer un SysAdmin: pruebas un cambio antes de llevarlo a producción, rompes cosas sin miedo y practicas con otras distribuciones.
 
@@ -38,6 +38,8 @@ También puedes revisarlo con:
 ```bash
 $ lscpu | grep -i virtualization
 ```
+
+![Verificar que tu CPU soporta virtualización](../assets/img/post/2026/10/001A-instalar-libvirt-virt-install-fedora-40-2.png)
 
 ## 2. Instalar el grupo de virtualización
 
@@ -101,6 +103,7 @@ Cierra sesión y vuelve a entrar para que el grupo se aplique. Luego verifica:
 $ virsh uri
 $ virsh list --all
 ```
+![Usar libvirt sin sudo](../assets/img/post/2026/10/001A-instalar-libvirt-virt-install-fedora-40-3.png)
 
 `virsh uri` debe mostrar `qemu:///system`, y `virsh list --all` una tabla vacía (todavía no tienes VMs).
 
@@ -118,7 +121,11 @@ $ virsh net-autostart default
 
 Si `net-start` dice que ya está activa, no pasa nada.
 
+![Activar la red default](../assets/img/post/2026/10/001A-instalar-libvirt-virt-install-fedora-40-4.png)
+
 ## 6. Crear tu primera VM con virt-install
+
+![Instalar libvirt y crear tu primera VM con virt-install en Fedora 40](../assets/img/post/2026/10/001A-instalar-libvirt-virt-install-fedora-40-1.jpg "Instalar libvirt y crear tu primera VM con virt-install en Fedora 40")
 
 Vamos a instalar **AlmaLinux 9** por red, en modo texto y con la consola serial, todo sin salir de la terminal.
 
@@ -127,6 +134,8 @@ Primero busca el nombre que libvirt usa para el sistema operativo invitado:
 ```bash
 $ virt-install --osinfo list | grep -i almalinux
 ```
+
+![Crear tu primera VM con virt-install](../assets/img/post/2026/10/001A-instalar-libvirt-virt-install-fedora-40-5.png)
 
 Y crea la VM:
 
@@ -155,6 +164,8 @@ $ virt-install \
 Se abrirá el instalador en tu terminal. Configura idioma, disco, usuario y contraseña de root, y espera a que termine.
 
 > Para salir de la consola de la VM sin apagarla usa **Ctrl + ]**.
+
+![Crear tu primera VM con virt-install](../assets/img/post/2026/10/001A-instalar-libvirt-virt-install-fedora-40-6.png)
 
 ### Si prefieres instalar desde una ISO
 
@@ -192,6 +203,8 @@ Y cuando ya no la necesites, para borrarla junto con su disco:
 $ virsh destroy alma9-lab
 $ virsh undefine alma9-lab --remove-all-storage
 ```
+
+![Administrar tus VMs con virsh](../assets/img/post/2026/10/001A-instalar-libvirt-virt-install-fedora-40-7.png)
 
 ## Problemas comunes
 
